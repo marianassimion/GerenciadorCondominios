@@ -69,10 +69,24 @@ def criar_residencia(condominio_cnpj, num_unidade, bloco, endereco):
         print(f"Erro ao criar residencia: {err}")
         conexao.rollback()
 
+def criar_empregado(cpf, nome, cargo, matricula, data_admissao, salario, condominio_cnpj):
+    comando = f'INSERT INTO EMPREGADO(cpf, nome, cargo, matricula, data_admissao, salario, condominio_cnpj) VALUES (%s, %s, %s, %s, %s, %s, %s)'                                              
+    valores = (cpf, nome, cargo, matricula, data_admissao, salario, condominio_cnpj)
+    try:
+        cursor.execute(comando, valores)
+        conexao.commit()
+        print(f"Empregado '{nome}' cadastrado com sucesso!")
+    
+    except mysql.connector.Error as err:
+        print(f"Erro ao inserir empregado: {err}")
+        conexao.rollback()
+
+#criar_empregado('123456', 'Empregado 1', 'teste 1', '11111', '2020-11-10', 1000.02, '3333')
+
+
 def criar_aviso(titulo, texto, id_administrador):
 
     comando = f'INSERT INTO AVISO(titulo, texto, id_administrador) VALUES (%s, %s, %s)'
-    
     valores = (titulo, texto, id_administrador)
     try:
         cursor.execute(comando, valores)
@@ -84,7 +98,7 @@ def criar_aviso(titulo, texto, id_administrador):
         conexao.rollback()
 
 
-criar_aviso('aviso 1', 'tentando criar um aviso sem usar o timestamp no código em python', 2)
+#criar_aviso('aviso 1', 'tentando criar um aviso sem usar o timestamp no código em python', 2)
 
 #condominios = listar_condominios()
 #print (*condominios)
