@@ -1,12 +1,13 @@
 import mysql.connector
-#import bcrypt
 import time
+from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME # Importa do config.py
+
 try:
     conexao = mysql.connector.connect(
-        host ='localhost',
-        user ='Mariana',
-        password='Banco.123',
-        database= 'condominio'
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        database=DB_NAME
     )
     cursor = conexao.cursor()
     print('Conexão bem-sucedida')
@@ -41,7 +42,6 @@ def criar_administrador(email, nome, senha):
     except mysql.connector.Error as err:
         print(f"Erro ao inserir administrador: {err}")
         conexao.rollback()
-
 
 
 def listar_condominios():
@@ -97,15 +97,21 @@ def criar_aviso(titulo, texto, id_administrador):
         print(f"Erro ao criar aviso: {err}")
         conexao.rollback()
 
+def criar_morador(cpf, nome, email, id_residencia):
+        comando = f'INSERT INTO MORADOR(cpf, nome, email, id_residencia) VALUES (%s, %s, %s, %s)'
+        valores = (cpf, nome, email, id_residencia)
+        try:
+            cursor.execute(comando, valores)
+            conexao.commit()
+            print(f"Morador '{nome}' criado com sucesso!")
+            
+        except mysql.connector.Error as err:
+            print(f"Erro ao criar morador: {err}")
+            conexao.rollback()
 
-#criar_aviso('aviso 1', 'tentando criar um aviso sem usar o timestamp no código em python', 2)
+#criar_residencia('1234567891012', '8', 'B','Testes')
 
-#condominios = listar_condominios()
-#print (*condominios)
-
-
-#criar_residencia('45645464','002', 'B', 'Teste 2 de criar residencia' )
-#criar_residencia('1234567891012','003', 'C', 'Teste 3 de criar residencia' )
+criar_morador('123456', 'teste 1', 'teste1@gmail.com', '7')
 
 cursor.close()
 conexao.close()

@@ -1,0 +1,7 @@
+# .gitignore
+# Ignorar arquivos de configuração que contêm senhas
+config.py
+
+# Ignorar pastas de ambiente virtual do Python
+venv/
+__pycache__/
