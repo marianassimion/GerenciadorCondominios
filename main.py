@@ -31,7 +31,6 @@ def criar_condominio(cnpj, nome, endereco):
         conexao.rollback() # Desfaz a operação em caso de erro
 
 def criar_administrador(email, nome, senha):
-
     comando = f'INSERT INTO ADMINISTRADOR(email, nome, senha) VALUES (%s, %s, %s)'
     valores = (email, nome, senha)
     try:
@@ -43,10 +42,8 @@ def criar_administrador(email, nome, senha):
         print(f"Erro ao inserir administrador: {err}")
         conexao.rollback()
 
-
 def listar_condominios():
     comando = "SELECT cnpj FROM CONDOMINIO"
-
     try:
         cursor.execute(comando)
         resultados = cursor.fetchall()
@@ -55,9 +52,7 @@ def listar_condominios():
         print(f"Erro ao consultar condomínios: {err}")
         return []
 
-
 def criar_residencia(condominio_cnpj, num_unidade, bloco, endereco):
-
     comando = f'INSERT INTO RESIDENCIA(condominio_cnpj, num_unidade, bloco, endereco) VALUES (%s, %s, %s, %s)'
     valores = (condominio_cnpj, num_unidade, bloco, endereco)
     try:
@@ -81,11 +76,7 @@ def criar_empregado(cpf, nome, cargo, matricula, data_admissao, salario, condomi
         print(f"Erro ao inserir empregado: {err}")
         conexao.rollback()
 
-#criar_empregado('123456', 'Empregado 1', 'teste 1', '11111', '2020-11-10', 1000.02, '3333')
-
-
 def criar_aviso(titulo, texto, id_administrador):
-
     comando = f'INSERT INTO AVISO(titulo, texto, id_administrador) VALUES (%s, %s, %s)'
     valores = (titulo, texto, id_administrador)
     try:
@@ -121,8 +112,39 @@ def criar_visitante(rg, nome, id_residencia):
             print(f"Erro ao criar visitante: {err}")
             conexao.rollback()
 
-criar_visitante('111111','visitante 1', '5')
+def criar_multa(status_pagamento, valor, descricao, id_residencia):
+        comando = f'INSERT INTO MULTA(status_pagamento, valor, descricao, id_residencia) VALUES (%s, %s, %s, %s)'
+        valores = (status_pagamento, valor, descricao, id_residencia)
+        try:
+            cursor.execute(comando, valores)
+            conexao.commit()
+            print(f"Multa '{descricao}' no valor de R${valor} para a residência {id_residencia} criada com sucesso!")            
+        except mysql.connector.Error as err:
+            print(f"Erro ao criar multa: {err}")
+            conexao.rollback()
 
+def criar_taxa(status_pagamento, valor, descricao, id_residencia):
+        comando = f'INSERT INTO TAXA(status_pagamento, valor, descricao, id_residencia) VALUES (%s, %s, %s, %s)'
+        valores = (status_pagamento, valor, descricao, id_residencia)
+        try:
+            cursor.execute(comando, valores)
+            conexao.commit()
+            print(f"Taxa '{descricao}' no valor de R${valor} para a residência {id_residencia} criada com sucesso!")            
+        except mysql.connector.Error as err:
+            print(f"Erro ao criar taxa: {err}")
+            conexao.rollback()
+
+def criar_veiculo(placa, modelo, cor, morador_cpf):
+        comando = f'INSERT INTO VEICULO(placa, modelo, cor, morador_cpf) VALUES (%s, %s, %s, %s)'
+        valores = (placa, modelo, cor, morador_cpf)
+        try:
+            cursor.execute(comando, valores)
+            conexao.commit()
+            print(f"Veículo '{modelo}' de placa '{placa}' vinculado ao morador {morador_cpf} criado com sucesso!")
+            
+        except mysql.connector.Error as err:
+            print(f"Erro ao criar veículo: {err}")
+            conexao.rollback()
 
 cursor.close()
 conexao.close()

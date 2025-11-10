@@ -1,4 +1,5 @@
-use condominio;
+SET FOREIGN_KEY_CHECKS = 0; -- Desliga a verificação
+
 DROP TABLE IF EXISTS CONDOMINIO;
 DROP TABLE IF EXISTS ADMINISTRADOR;
 DROP TABLE IF EXISTS RESIDENCIA;
@@ -11,6 +12,8 @@ DROP TABLE IF EXISTS VEICULO;
 DROP TABLE IF EXISTS TAXA;
 DROP TABLE IF EXISTS MULTA;
 
+SET FOREIGN_KEY_CHECKS = 1; -- Liga a verificação de volta
+
 CREATE TABLE CONDOMINIO(
 	cnpj 				varchar(16) PRIMARY KEY,
     nome 				varchar(65) NOT NULL,
@@ -21,7 +24,7 @@ CREATE TABLE ADMINISTRADOR(
 	id_administrador 	integer AUTO_INCREMENT PRIMARY KEY,
     email				varchar(65),
     nome 				varchar(65) NOT NULL,
-    senha				varchar(20) NOT NULL
+    senha				varchar(255) NOT NULL --aplicar função hash
 );
 
 CREATE TABLE RESIDENCIA(
@@ -81,17 +84,18 @@ CREATE TABLE VEICULO(
 
 CREATE TABLE TAXA(
 	id_taxa 			INTEGER AUTO_INCREMENT PRIMARY KEY,
-    data_emissao 		date NOT NULL,
-	data_vencimento 	date NOT NULL,
+    data_emissao 		date NOT NULL DEFAULT (CURRENT_DATE),
+	data_vencimento 	DATE AS (DATE_ADD(data_emissao, INTERVAL 30 DAY)) STORED,
     valor				decimal(10,2),
     status_pagamento	varchar(10),
+    descricao 			VARCHAR(220),
 	id_residencia 		integer,
 	FOREIGN KEY(id_residencia) references residencia(id_residencia)
 );
 
 CREATE TABLE MULTA (
     id_multa 			INTEGER AUTO_INCREMENT PRIMARY KEY,
-	data_emissao 		date NOT NULL,
+    data_emissao 		date NOT NULL DEFAULT (CURRENT_DATE),
 	status_pagamento	varchar(10),
     valor 				DECIMAL(10, 2),
     descricao 			VARCHAR(220),
