@@ -109,9 +109,20 @@ def criar_morador(cpf, nome, email, id_residencia):
             print(f"Erro ao criar morador: {err}")
             conexao.rollback()
 
-#criar_residencia('1234567891012', '8', 'B','Testes')
+def criar_visitante(rg, nome, id_residencia):
+        comando = f'INSERT INTO VISITANTE(rg, nome, id_residencia) VALUES (%s, %s, %s)'
+        valores = (rg, nome, id_residencia)
+        try:
+            cursor.execute(comando, valores)
+            conexao.commit()
+            print(f"Visitante '{nome}' para a residência {id_residencia} criado com sucesso!")
+            
+        except mysql.connector.Error as err:
+            print(f"Erro ao criar visitante: {err}")
+            conexao.rollback()
 
-criar_morador('123456', 'teste 1', 'teste1@gmail.com', '7')
+criar_visitante('111111','visitante 1', '5')
+
 
 cursor.close()
 conexao.close()

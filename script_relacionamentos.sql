@@ -1,21 +1,20 @@
 use condominio;
-DROP TABLE IF EXISTS MORADOR;
-DROP TABLE IF EXISTS RESIDENCIA;
 DROP TABLE IF EXISTS CONDOMINIO;
 DROP TABLE IF EXISTS ADMINISTRADOR;
+DROP TABLE IF EXISTS RESIDENCIA;
 DROP TABLE IF EXISTS EMPREGADO;
+DROP TABLE IF EXISTS AVISO;
+DROP TABLE IF EXISTS MORADOR;
+DROP TABLE IF EXISTS TELEFONE_MORADOR;
+DROP TABLE IF EXISTS VISITANTE;
 DROP TABLE IF EXISTS VEICULO;
 DROP TABLE IF EXISTS TAXA;
 DROP TABLE IF EXISTS MULTA;
-DROP TABLE IF EXISTS AVISO;
 
 CREATE TABLE CONDOMINIO(
 	cnpj 				varchar(16) PRIMARY KEY,
     nome 				varchar(65) NOT NULL,
     endereco			varchar(150) NOT NULL
-    /*sindico				boolean,
-    total_moradores		INTEGER UNSIGNED,
-    total_residencias	INTEGER UNSIGNED*/
 );
 
 CREATE TABLE ADMINISTRADOR(
@@ -72,7 +71,6 @@ CREATE TABLE TELEFONE_MORADOR(
 );
 
 
-
 CREATE TABLE VEICULO(
 	placa 				varchar(10) PRIMARY KEY,
 	modelo 				varchar(40) NOT NULL,
@@ -99,6 +97,16 @@ CREATE TABLE MULTA (
     descricao 			VARCHAR(220),
 	id_residencia 		integer,
 	FOREIGN KEY(id_residencia) references residencia(id_residencia)
+);
+
+
+CREATE TABLE VISITANTE(
+    id_visitante        INTEGER AUTO_INCREMENT PRIMARY KEY,
+    rg   				varchar(14),
+    nome 				varchar(65) NOT NULL,
+    data_entrada        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id_residencia 		integer,
+	FOREIGN KEY(id_residencia) references RESIDENCIA(id_residencia)
 );
 
 
