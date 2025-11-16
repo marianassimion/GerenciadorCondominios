@@ -1,6 +1,16 @@
 import mysql.connector
-import time
+#import time
 from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME # Importa do config.py
+from flask import Flask
+
+app = Flask('Gerenciador') #instanciando o flask na variável app
+
+@app.route('/Condominios', methods=['GET'])
+
+def get_condominios():
+     return Condominios
+
+app.run()
 
 try:
     conexao = mysql.connector.connect(
@@ -145,6 +155,9 @@ def criar_veiculo(placa, modelo, cor, morador_cpf):
         except mysql.connector.Error as err:
             print(f"Erro ao criar veículo: {err}")
             conexao.rollback()
+
+
+
 
 cursor.close()
 conexao.close()
