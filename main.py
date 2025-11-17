@@ -1,16 +1,6 @@
 import mysql.connector
-#import time
 from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME # Importa do config.py
-from flask import Flask
-
-app = Flask('Gerenciador') #instanciando o flask na variável app
-
-@app.route('/Condominios', methods=['GET'])
-
-def get_condominios():
-     return Condominios
-
-app.run()
+from flask import Flask, make_response, jsonify, request
 
 try:
     conexao = mysql.connector.connect(
@@ -25,7 +15,6 @@ try:
 except mysql.connector.Error as err:
     print(f"Erro ao conectar no MySQL: {err}")
     exit()
-
 
 def criar_condominio(cnpj, nome, endereco):
     comando = f'INSERT INTO condominio (cnpj, nome, endereco) VALUES (%s, %s, %s)'

@@ -1,68 +1,61 @@
-# Em app.py (seu novo servidor Flask)
-
-# (Importações no topo do arquivo)
 import mysql.connector
-from flask import Flask, jsonify
-from flask_cors import CORS
-# (Não precisamos de 'request' aqui, pois GET não recebe dados no corpo)
+from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME # Importa do config.py
+from flask import Flask, make_response, jsonify, request
+#from flask_cors import CORS # Importe o CORS
 
-app = Flask(__name__)
-CORS(app)
 
-# (Função de conexão que criamos antes)
+app = Flask('Gerenciador') #instanciando o flask na variável app
+app.config['JSON_SORT_KEYS'] = False
+#CORS(app)
+
 def get_db_connection():
-    # ... (código da conexão igual ao da resposta anterior) ...
     try:
         conexao = mysql.connector.connect(
-            host='localhost',
-            user='Mariana',
-            password='Banco.123',
-            database='condominio'
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            database=DB_NAME
         )
-        # Importante: dictionary=True
-        # Faz o cursor.fetchall() retornar uma lista de dicionários!
-        # Isso economiza o loop de conversão manual.
-        return conexao
+        cursor = conexao.cursor(dictionary=True)
+        print('Conexão bem-sucedida')
+        return conexao, cursor
     except mysql.connector.Error as err:
-        print(f"Erro ao conectar: {err}")
-        return None
+        print(f"Erro ao conectar no MySQL: {err}")
+        #exit()
+        return None, None
 
-# --- AQUI ESTÁ A MÁGICA DA CONSULTA (GET) ---
-@app.route('/api/avisos', methods=['GET'])
-def api_listar_avisos():
-    
-    conexao = get_db_connection()
-    if not conexao:
-        return jsonify({"erro": "Falha na conexão com o banco"}), 500
 
-    # dictionary=True faz a mágica!
-    # Em vez de tuplas (1, 'Aviso 1'), ele retorna dicionários
-    # {'id_aviso': 1, 'titulo': 'Aviso 1'}
-    cursor = conexao.cursor(dictionary=True) 
-    
-    comando = "SELECT id_aviso, titulo, texto, data_aviso FROM AVISO ORDER BY data_aviso DESC"
-    
+
+@app.route('/condominios', methods=['GET'])
+
+def get_condominios():
+    conexao, cursor = get_db_connection()
+
+    if conexao is None:
+        return jsonify(erro="Não foi possível ligar a base de dados"), 500
+
     try:
-        cursor.execute(comando)
-        avisos = cursor.fetchall() # Agora 'avisos' é uma lista de dicionários
-        
-        # 3. Envia a lista de avisos (já em formato JSON) de volta para o front-end
-        return jsonify(avisos), 200 # 200 = OK
-        
+        cursor.execute('SELECT * FROM condominio')
+        meus_condominios = cursor.fetchall()
+        print(meus_condominios)
+        return make_response(
+            jsonify(
+                mensagem = 'Lista de condomínios',
+                dados = meus_condominios
+            )
+        )
+    
     except mysql.connector.Error as err:
-        return jsonify({"erro": f"Erro ao consultar avisos: {err}"}), 400
+        return jsonify(erro=f"Erro ao consultar: {err}"), 400
     
     finally:
-        # Sempre feche o cursor e a conexão
-        cursor.close()
-        conexao.close()
+        # 3. Fechar a conexão e o cursor DEPOIS de os usar
+        if cursor:
+            cursor.close()
+        if conexao:
+            conexao.close()
+            
 
-# --- Rota para criar (que você já tinha) ---
-@app.route('/api/criar_aviso', methods=['POST'])
-def api_criar_aviso():
-    # ... (seu código de criar aviso aqui) ...
-    pass
-
-# --- Inicia o Servidor ---
 if __name__ == '__main__':
+    print("Iniciando o servidor Flask em http://127.0.0.1:5000/")
     app.run(debug=True)
