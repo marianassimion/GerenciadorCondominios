@@ -99,6 +99,16 @@ def criar_condominio(nome, cnpj, logradouro, bairro, cidade, uf, cep):
 
     return True
 
+def obter_empregados(cnpj):
+    comando = "SELECT nome, cargo, matricula, data_admissao, salario FROM EMPREGADO WHERE condominio_cnpj = %s"
+
+    try:
+        cursor.execute(comando, (cnpj, ))
+        resultado = cursor.fetchall()
+        return resultado
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao buscar empregados: {err}")
+        return None
 # =========================================================================
 # GESTÃO DE ESTADO (STREAMLIT SESSION STATE)
 # =========================================================================
@@ -110,7 +120,10 @@ if 'editing_cnpj' not in st.session_state:
     st.session_state.editing_cnpj = None
 if 'create_mode' not in st.session_state:
     st.session_state.create_mode = False
-
+if 'details_mode' not in st.session_state:
+    st.session_state.details_mode = False
+if 'detail_cnpj' not in st.session_state:
+    st.session_state.detail_cnpj= None
 # Funções de navegação para limpar estados
 def sair_do_modo_edicao():
     st.session_state.edit_mode = False
@@ -127,6 +140,10 @@ def sair_do_modo_criacao():
     st.session_state.create_mode = False
     st.rerun()
 
+def sair_do_modo_detalhamento():
+    st.session_state.details_mode = False
+    st.session_state.detail_cnpj = None
+    st.rerun()
 # Carrega os dados mais recentes (executado a cada rerun)
 lista_condominios = listar_condominios()
 
@@ -134,7 +151,7 @@ lista_condominios = listar_condominios()
 # LÓGICA DE VISUALIZAÇÃO DE ESTADOS
 # =========================================================================
 
-#------------MODO DE CRIAÇÃO------------
+#------------------MODO DE CRIAÇÃO------------------
 
 if st.session_state.create_mode:
     st.button("↩ Voltar para Lista", on_click=sair_para_listagem, key="btn_back_create")
@@ -162,7 +179,7 @@ if st.session_state.create_mode:
                 st.balloons()
                 sair_para_listagem()
 
-#------------MODO DE EDIÇÃO------------
+#------------------MODO DE EDIÇÃO------------------
 elif st.session_state.edit_mode:
         cnpj_para_editar = st.session_state.editing_cnpj
         dados_atuais = obter_condominio_por_cnpj(cnpj_para_editar)
@@ -199,7 +216,56 @@ elif st.session_state.edit_mode:
             st.error(f"Condomínio com CNPJ '{cnpj_para_editar}' não encontrado para edição.")
             st.button("Voltar para Lista", on_click=sair_do_modo_edicao)
 
-#------------------MODO DE LISTAGEM-----------------------
+#------------------DETALHAMENTO DO CONDOMINIO------------------
+elif st.session_state.details_mode:
+    cnpj_para_detalhar = st.session_state.detail_cnpj
+    dados_condominio = obter_condominio_por_cnpj(cnpj_para_detalhar)
+    empregados = obter_empregados(cnpj_para_detalhar)
+    
+    if dados_condominio:
+        nome_condominio, logradouro, bairro, cidade, uf, cep = dados_condominio
+        st.title(f"{nome_condominio}")
+        st.caption(f"Logradouro: {logradouro}")
+        st.caption(f"Bairro: {bairro}")
+        st.caption(f"Cidade: {cidade}")
+        st.caption(f"UF: {uf}")
+        st.caption(f"CEP: {cep}")
+
+        st.header("Empregados")
+        c1, c2, c3, c4, c5 = st.columns([3, 2, 1, 1.5, 1.5])
+        c1.markdown("**Nome**")
+        c2.markdown("**Cargo**")
+        c3.markdown("**Matrícula**")
+        c4.markdown("**Admissão**")
+        c5.markdown("**Salário**")
+        st.divider()
+
+        if empregados:
+            with st.container(height=300, border=False):
+               for emp in empregados:
+                    # O fetchall retorna uma lista de tuplas, então acessamos por índice
+                    # 0=nome, 1=cargo, 2=matricula, 3=data, 4=salario
+                    nome_emp = emp[0]
+                    cargo_emp = emp[1]
+                    mat_emp = emp[2]
+                    data_emp = emp[3]
+                    sal_emp = emp[4]
+
+                    col_nome, col_cargo, col_matricula, col_data, col_salario = st.columns([3, 2, 1, 1.5, 1.5]) 
+
+                    with col_nome:
+                        st.write(nome_emp)
+                    with col_cargo:
+                        st.write(cargo_emp)
+                    with col_matricula:
+                        st.write(str(mat_emp))
+                    with col_data:
+                        st.write(str(data_emp))
+                    with col_salario:
+                        st.write(f"R$ {sal_emp}")
+        else:
+            st.info("Nenhum empregado cadastrado neste condomínio.")
+#------------------MODO DE LISTAGEM------------------
 else:
     # HEADER ADMINISTRADOR
     with st.container(border=True):
@@ -243,7 +309,12 @@ else:
 
                     # Botões de visualizar, editar e excluir
                     with col_inf:
-                        st.button(":material/visibility:", key=f"btn_info_{cnpj_condominio}", help="Mais informações")
+                        detalhes_clicked = st.button(":material/visibility:", key=f"btn_info_{cnpj_condominio}", help="Mais informações")
+
+                        if detalhes_clicked:
+                            st.session_state.details_mode = True
+                            st.session_state.detail_cnpj = cnpj_condominio
+                            st.rerun()
                     
                     # BOTÃO EDITAR
                     with col_editar:
@@ -260,7 +331,6 @@ else:
                         deleted_clicked = st.button(":material/delete:", key=f"btn_del_{cnpj_condominio}", help="Excluir condomínio")
 
                     if deleted_clicked:
-                        print(f"Botão de deletar clicado para CNPJ: {cnpj_condominio}")
                         if deletar_condominio(cnpj_condominio):
                             st.success(f"Condomínio {nome_condominio} excluído com sucesso!")
                             st.rerun()
@@ -270,7 +340,7 @@ else:
                 st.session_state.create_mode = True
                 st.rerun()
 
-    
+
 
 
 # =========================================================================

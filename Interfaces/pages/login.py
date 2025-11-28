@@ -10,7 +10,7 @@ def login_page():
     # Imagem do usuário e título
     col1, col2, col3 = st.columns([1, 0.3, 1])
     with col2:
-        st.image(r"img\user4.png", width=90)
+        st.image("../img/user4.png", width=90)
 
     st.markdown("<div style='text-align: center; font-size: 24px;'>Administrador</div>", unsafe_allow_html=True)
 
