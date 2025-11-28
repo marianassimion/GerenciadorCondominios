@@ -1,11 +1,10 @@
 import streamlit as st
 import mysql.connector
-# Assumindo que config.py está no mesmo nível de diretório ou no path
 from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME 
 
 
 # =========================================================================
-# 1. CONEXÃO COM O BANCO DE DADOS
+# CONEXÃO COM O BANCO DE DADOS
 # =========================================================================
 
 try:
@@ -20,12 +19,12 @@ try:
 
 except mysql.connector.Error as err:
     st.error(f"Erro ao conectar no MySQL: Verifique as configurações no config.py. Erro: {err}")
-    # Usar st.stop() para interromper a execução do Streamlit
+    #interromper a execução do Streamlit
     st.stop()
 
 
 # =========================================================================
-# 2. VARIÁVEIS E FUNÇÕES DE GESTÃO DE DADOS
+# VARIÁVEIS E FUNÇÕES DE GESTÃO DE DADOS
 # =========================================================================
 
 admin_name = "Nome do Administrador"
@@ -85,8 +84,23 @@ def deletar_condominio(cnpj):
         conexao.rollback()
         return False
 
+def criar_condominio(nome, cnpj, logradouro, bairro, cidade, uf, cep):
+    comando = f'INSERT INTO condominio (nome, cnpj, logradouro, bairro, cidade, uf, cep) VALUES (%s, %s, %s, %s, %s, %s, %s)'
+    valores = (nome, cnpj, logradouro, bairro, cidade, uf, cep)
+
+    try:
+        cursor.execute(comando, valores) # Executa o comando seguro
+        conexao.commit()                 # Salva as alterações
+        print(f"Condomínio '{nome}' criado com sucesso!")
+
+    except mysql.connector.Error as err:
+        print(f"Erro ao inserir condomínio: {err}")
+        conexao.rollback() # Desfaz a operação em caso de erro
+
+    return True
+
 # =========================================================================
-# 3. GESTÃO DE ESTADO (STREAMLIT SESSION STATE)
+# GESTÃO DE ESTADO (STREAMLIT SESSION STATE)
 # =========================================================================
 
 # Inicializa o estado da sessão para controle de navegação
@@ -94,48 +108,62 @@ if 'edit_mode' not in st.session_state:
     st.session_state.edit_mode = False
 if 'editing_cnpj' not in st.session_state:
     st.session_state.editing_cnpj = None
+if 'create_mode' not in st.session_state:
+    st.session_state.create_mode = False
 
-# Função para sair do modo de edição
+# Funções de navegação para limpar estados
 def sair_do_modo_edicao():
     st.session_state.edit_mode = False
     st.session_state.editing_cnpj = None
+    st.rerun()
+
+def sair_para_listagem():
+    st.session_state.create_mode = False
+    st.session_state.edit_mode = False
+    st.session_state.editing_cnpj = None
+    st.rerun()
+
+def sair_do_modo_criacao():
+    st.session_state.create_mode = False
     st.rerun()
 
 # Carrega os dados mais recentes (executado a cada rerun)
 lista_condominios = listar_condominios()
 
 # =========================================================================
-# 4. PAINEL DO ADMINISTRADOR (Sempre visível)
+# LÓGICA DE VISUALIZAÇÃO DE ESTADOS
 # =========================================================================
 
-with st.container(border=True):
-    col_icon, col_inf, col_editar, col_sair = st.columns([0.8, 4, 0.5, 0.5], vertical_alignment="center")
+#------------MODO DE CRIAÇÃO------------
 
-    with col_icon:
-        st.image("../img/user5.png", width=70) 
-
-    with col_inf:
-        st.markdown(f"**{admin_name}**")
-        st.caption(f"{admin_email}")
-
-    with col_editar:
-        st.button(":material/edit_square:", help="Editar perfil", key="btn_admin_edit")
-
-    with col_sair:
-        st.button(":material/logout:", help="Sair da conta", key="btn_admin_sair")
-
-
-# =========================================================================
-# 5. LÓGICA DE EDIÇÃO E LISTAGEM
-# =========================================================================
-
-# Painel de condomínios
-with st.container(border=True):
+if st.session_state.create_mode:
+    st.button("↩ Voltar para Lista", on_click=sair_para_listagem, key="btn_back_create")
+    st.title("➕ Cadastro de Novo Condomínio")
+    st.write("Preencha os campos abaixo para registrar um novo condomínio no sistema.")
     
-    # ------------------------------------------------
-    # MODO DE EDIÇÃO
-    # ------------------------------------------------
-    if st.session_state.edit_mode:
+    with st.form(key='cadastro_form'):
+        nome_input = st.text_input('Nome do Condomínio')
+        cnpj_input = st.text_input('CNPJ (apenas números)')
+        logradouro_input = st.text_input('Logradouro')
+        bairro_input = st.text_input('Bairro')
+        cidade_input = st.text_input('Cidade')
+        uf_input = st.text_input('UF')
+        cep_input = st.text_input('CEP')
+        enviado = st.form_submit_button('Salvar Cadastro', type="primary", use_container_width=True)
+    
+    if enviado:
+        if not nome_input or not cnpj_input:
+            st.error('Os campos Nome e CNPJ são obrigatórios.')
+        else:
+            # Chama a função de criação com os dados do formulário
+            if criar_condominio(nome_input, cnpj_input, logradouro_input, bairro_input, cidade_input, uf_input, cep_input):
+                st.success('✅ Cadastro realizado com sucesso!')
+                # Volta automaticamente para a lista após o sucesso
+                st.balloons()
+                sair_para_listagem()
+
+#------------MODO DE EDIÇÃO------------
+elif st.session_state.edit_mode:
         cnpj_para_editar = st.session_state.editing_cnpj
         dados_atuais = obter_condominio_por_cnpj(cnpj_para_editar)
 
@@ -158,10 +186,7 @@ with st.container(border=True):
                 nova_uf = st.text_input("UF", value=uf_atual)
                 novo_cep = st.text_input("CEP", value=cep_atual)
                 
-                col_salvar, col_cancelar = st.columns(2)
-                
-                with col_salvar:
-                    salvar = st.form_submit_button("Salvar Alterações", type="primary", use_container_width=True)
+                salvar = st.form_submit_button("Salvar Alterações", type="primary", use_container_width=True)
                     
             if salvar:
                 # 3. Chamada da função com todos os 6 argumentos de dados + o CNPJ de identificação
@@ -174,10 +199,26 @@ with st.container(border=True):
             st.error(f"Condomínio com CNPJ '{cnpj_para_editar}' não encontrado para edição.")
             st.button("Voltar para Lista", on_click=sair_do_modo_edicao)
 
-    # ------------------------------------------------
-    # MODO DE LISTAGEM (NÃO ESTÁ EDITANDO)
-    # ------------------------------------------------
-    else:
+#------------------MODO DE LISTAGEM-----------------------
+else:
+    # HEADER ADMINISTRADOR
+    with st.container(border=True):
+        col_icon, col_inf, col_editar, col_sair = st.columns([0.8, 4, 0.5, 0.5], vertical_alignment="center")
+
+        with col_icon:
+            st.image("../img/user5.png", width=70) 
+
+        with col_inf:
+            st.markdown(f"**{admin_name}**")
+            st.caption(f"{admin_email}")
+
+        with col_editar:
+            st.button(":material/edit_square:", help="Editar perfil", key="btn_admin_edit")
+
+        with col_sair:
+            st.button(":material/logout:", help="Sair da conta", key="btn_admin_sair")
+    
+    with st.container(border=True):
         st.markdown("<div style='text-align: center; font-size: 24px;'>Condomínios</div>", unsafe_allow_html=True)
         st.write("") 
 
@@ -223,10 +264,14 @@ with st.container(border=True):
                         if deletar_condominio(cnpj_condominio):
                             st.success(f"Condomínio {nome_condominio} excluído com sucesso!")
                             st.rerun()
+            cadastrar_clicked = st.button("Cadastrar +",  help="Cadastrar novo condomínio", use_container_width=True)
 
-# Botão de cadastro de condomínio (só aparece se não estiver editando)
-if not st.session_state.edit_mode:
-    cadastrar_condominio = st.button("Cadastrar +", help="Cadastrar novo condomínio", use_container_width=True)
+            if cadastrar_clicked:
+                st.session_state.create_mode = True
+                st.rerun()
+
+    
+
 
 # =========================================================================
 # 6. FECHAR CONEXÃO
