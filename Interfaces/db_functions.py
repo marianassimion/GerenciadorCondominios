@@ -144,6 +144,25 @@ def atualizar_empregado(cpf_original, nome, cargo, matricula, data_admissao, sal
     finally:
         cursor.close()
 
+
+
+def criar_aviso(titulo, texto, id_administrador, condominio_cnpj):
+    cursor = conexao.cursor(buffered=True)
+    try:
+        comando = f'INSERT INTO AVISO(titulo, texto, id_administrador) VALUES (%s, %s, %s)'
+        valores = (titulo, texto, id_administrador)
+        cursor.execute(comando, valores)
+        conexao.commit()
+        print(f"Aviso '{titulo}' criado com sucesso!")
+        return True
+        
+    except mysql.connector.Error as err:
+        print(f"Erro ao criar aviso: {err}")
+        conexao.rollback()
+        return False
+    finally:
+        cursor.close()
+
 # =========================================================================
 # FUNÇÃO DE LOGIN 
 # =========================================================================

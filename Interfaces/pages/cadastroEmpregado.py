@@ -19,7 +19,7 @@ nome_condominio = dados_condo[0] if dados_condo else "Não identificado"
 # Botão de Voltar
 if st.button("Voltar para Detalhes"):
     st.session_state.details_condominio_mode = True 
-    st.switch_page("home.py")
+    st.switch_page("pages/detalharCondominio.py")
 
 st.title("Novo Colaborador")
 st.write(f"Cadastrando funcionário no condomínio: **{nome_condominio}**")

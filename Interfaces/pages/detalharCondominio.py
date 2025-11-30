@@ -14,7 +14,7 @@ if 'detail_cnpj' not in st.session_state or st.session_state.detail_cnpj is None
 cnpj_atual = st.session_state.detail_cnpj
 
 if st.button("Voltar para Home"):
-    st.switch_page("home.py")
+    st.switch_page("pages/home.py")
 
 
 dados_condominio = obter_condominio_por_cnpj(cnpj_atual)
@@ -28,6 +28,12 @@ if dados_condominio:
     st.caption(f"{log}, {bai} - {cid}/{uf} | CEP: {cep}")
     st.caption(f"CNPJ: {cnpj_atual}")
     st.divider()
+
+    # --- SEÇÃO DE AVISOS ---
+    col_tit, col_btn = st.columns([3, 1], vertical_alignment="bottom")
+    col_tit.subheader("Quadro de avisos")
+    if col_btn.button("Novo aviso", use_container_width=True):
+        st.switch_page("pages/cadastroAviso.py")
 
     # --- SEÇÃO DE EMPREGADOS ---
     col_tit, col_btn = st.columns([3, 1], vertical_alignment="bottom")
