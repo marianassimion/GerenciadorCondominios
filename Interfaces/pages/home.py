@@ -109,40 +109,67 @@ def obter_empregados(cnpj):
     except mysql.connector.Error as err:
         st.error(f"Erro ao buscar empregados: {err}")
         return None
+
+def criar_empregado(cpf, nome, cargo, matricula, data_admissao, salario, condominio_cnpj):
+    comando = f'INSERT INTO EMPREGADO(cpf, nome, cargo, matricula, data_admissao, salario, condominio_cnpj) VALUES (%s, %s, %s, %s, %s, %s, %s)'                                              
+    valores = (cpf, nome, cargo, matricula, data_admissao, salario, condominio_cnpj)
+    try:
+        cursor.execute(comando, valores)
+        conexao.commit()
+        print(f"Empregado '{nome}' cadastrado com sucesso!")
+        return True
+    
+    except mysql.connector.Error as err:
+        print(f"Erro ao inserir empregado: {err}")
+        conexao.rollback()
+
+
 # =========================================================================
 # GESTÃO DE ESTADO (STREAMLIT SESSION STATE)
 # =========================================================================
 
 # Inicializa o estado da sessão para controle de navegação
-if 'edit_mode' not in st.session_state:
-    st.session_state.edit_mode = False
+if 'edit_condominio_mode' not in st.session_state:
+    st.session_state.edit_condominio_mode = False
 if 'editing_cnpj' not in st.session_state:
     st.session_state.editing_cnpj = None
-if 'create_mode' not in st.session_state:
-    st.session_state.create_mode = False
-if 'details_mode' not in st.session_state:
-    st.session_state.details_mode = False
+if 'create_condominio_mode' not in st.session_state:
+    st.session_state.create_condominio_mode = False
+if 'details_condominio_mode' not in st.session_state:
+    st.session_state.details_condominio_mode = False
 if 'detail_cnpj' not in st.session_state:
     st.session_state.detail_cnpj= None
+if 'create_empregado_mode' not in st.session_state:
+    st.session_state.create_empregado_mode = False
+
 # Funções de navegação para limpar estados
-def sair_do_modo_edicao():
-    st.session_state.edit_mode = False
+def sair_do_modo_edicao_condominio():
+    st.session_state.edit_condominio_mode = False
     st.session_state.editing_cnpj = None
     st.rerun()
 
-def sair_para_listagem():
-    st.session_state.create_mode = False
-    st.session_state.edit_mode = False
+def sair_para_listagem_condominio():
+    st.session_state.details_condominio_mode = False 
+    
+    # Limpa as outras (por garantia)
+    st.session_state.create_condominio_mode = False
+    st.session_state.edit_condominio_mode = False
+    
+    # Limpa os dados temporários
     st.session_state.editing_cnpj = None
-    st.rerun()
+    st.session_state.detail_cnpj = None
 
-def sair_do_modo_criacao():
-    st.session_state.create_mode = False
+def sair_do_modo_criacao_condominio():
+    st.session_state.create_condominio_mode = False
     st.rerun()
 
 def sair_do_modo_detalhamento():
-    st.session_state.details_mode = False
+    st.session_state.details_condominio_mode = False
     st.session_state.detail_cnpj = None
+    st.rerun()
+
+def sair_do_modo_criacao_empregado():
+    st.session_state.create_empregado_mode = False
     st.rerun()
 # Carrega os dados mais recentes (executado a cada rerun)
 lista_condominios = listar_condominios()
@@ -151,36 +178,79 @@ lista_condominios = listar_condominios()
 # LÓGICA DE VISUALIZAÇÃO DE ESTADOS
 # =========================================================================
 
-#------------------MODO DE CRIAÇÃO------------------
+#------------------MODO DE CRIAÇÃO DE CONDOMINIOS------------------
 
-if st.session_state.create_mode:
-    st.button("↩ Voltar para Lista", on_click=sair_para_listagem, key="btn_back_create")
-    st.title("➕ Cadastro de Novo Condomínio")
+if st.session_state.create_condominio_mode:
+    st.button("Voltar para Listagem de Condomínios", on_click=sair_para_listagem_condominio, key="btn_back_create")
+    st.title("Cadastro de Novo Condomínio")
     st.write("Preencha os campos abaixo para registrar um novo condomínio no sistema.")
     
     with st.form(key='cadastro_form'):
-        nome_input = st.text_input('Nome do Condomínio')
-        cnpj_input = st.text_input('CNPJ (apenas números)')
-        logradouro_input = st.text_input('Logradouro')
-        bairro_input = st.text_input('Bairro')
-        cidade_input = st.text_input('Cidade')
-        uf_input = st.text_input('UF')
-        cep_input = st.text_input('CEP')
+        nome_condominio_input = st.text_input('Nome do Condomínio')
+        cnpj_condominio_input = st.text_input('CNPJ (apenas números)')
+        logradouro_condominio_input = st.text_input('Logradouro')
+        bairro_condominio_input = st.text_input('Bairro')
+        cidade_condominio_input = st.text_input('Cidade')
+        uf_condominio_input = st.text_input('UF')
+        cep_condominio_input = st.text_input('CEP')
         enviado = st.form_submit_button('Salvar Cadastro', type="primary", use_container_width=True)
     
     if enviado:
-        if not nome_input or not cnpj_input:
+        if not nome_condominio_input or not cnpj_condominio_input:
             st.error('Os campos Nome e CNPJ são obrigatórios.')
         else:
             # Chama a função de criação com os dados do formulário
-            if criar_condominio(nome_input, cnpj_input, logradouro_input, bairro_input, cidade_input, uf_input, cep_input):
+            if criar_condominio(nome_condominio_input, cnpj_condominio_input, logradouro_condominio_input, bairro_condominio_input, cidade_condominio_input, uf_condominio_input, cep_condominio_input):
                 st.success('✅ Cadastro realizado com sucesso!')
                 # Volta automaticamente para a lista após o sucesso
                 st.balloons()
-                sair_para_listagem()
+                sair_para_listagem_condominio()
 
-#------------------MODO DE EDIÇÃO------------------
-elif st.session_state.edit_mode:
+#------------------MODO DE CRIAÇÃO DE EMPREGADO------------------
+elif st.session_state.create_empregado_mode:
+    st.button("Voltar para a listagem de empregados", on_click = sair_do_modo_criacao_empregado)
+
+    # 1. PEGAR O CNPJ DA SESSÃO (Ele já está salvo aqui!)
+    condominio_cnpj = st.session_state.detail_cnpj 
+
+    # 2. BUSCAR O NOME
+    dados_condo = obter_condominio_por_cnpj(condominio_cnpj)
+    
+    # Verifica se achou e pega o nome 
+    nome_condominio = dados_condo[0] if dados_condo else "Condomínio não identificado"
+
+    st.title("Cadastro de novo empregado")
+    st.write(f"Preencha os campos abaixo para registrar um novo empregado ao Condomínio {nome_condominio}")
+    
+    with st.form(key='cadastro_empregado_form'):
+        cpf_empregado__input = st.text_input('CPF (apenas números)')
+        nome_empregado_input = st.text_input('Nome do Empregado')
+        cargo_empregado_input = st.text_input('Cargo')
+        matricula_empregado_input = st.text_input('Matrícula (apenas números)')
+        data_admissao_empregado_input = st.date_input('Data de Admissão')
+        salario_empregado_input = st.number_input('Salário')
+        enviado_empregado = st.form_submit_button('Salvar Cadastro', type="primary", use_container_width=True)
+    
+    cancelar_empregado = st.button("Cancelar", on_click=sair_do_modo_criacao_empregado, use_container_width=True) 
+
+    if enviado_empregado:
+        if not nome_empregado_input or not cpf_empregado__input:
+            st.error('Os campos Nome e CPF são obrigatórios.')
+        else:
+            cpf_limpo = cpf_empregado__input.replace(".", "").replace("-", "")
+
+            if len(cpf_limpo) > 11:
+                st.error("O CPF tem dígitos demais. Digite apenas números.")
+            else:
+                # Chama a função de criação
+                if criar_empregado(cpf_limpo, nome_empregado_input, cargo_empregado_input, matricula_empregado_input, data_admissao_empregado_input, salario_empregado_input, condominio_cnpj):
+                    st.success('✅ Cadastro realizado com sucesso!')
+                    st.balloons()
+                    sair_do_modo_criacao_empregado()
+
+
+#------------------MODO DE EDIÇÃO DE CONDOMINIO------------------
+elif st.session_state.edit_condominio_mode:
         cnpj_para_editar = st.session_state.editing_cnpj
         dados_atuais = obter_condominio_por_cnpj(cnpj_para_editar)
 
@@ -209,36 +279,40 @@ elif st.session_state.edit_mode:
                 # 3. Chamada da função com todos os 6 argumentos de dados + o CNPJ de identificação
                 if atualizar_condominio(cnpj_para_editar, novo_nome, novo_logradouro, novo_bairro, nova_cidade, nova_uf, novo_cep):
                     st.success(f"Condomínio **{novo_nome}** atualizado com sucesso!")
-                    sair_do_modo_edicao()
-            st.button("Cancelar", on_click=sair_do_modo_edicao, use_container_width=True) 
+                    sair_do_modo_edicao_condominio()
+            st.button("Cancelar", on_click=sair_do_modo_edicao_condominio, use_container_width=True) 
    
         else:
             st.error(f"Condomínio com CNPJ '{cnpj_para_editar}' não encontrado para edição.")
-            st.button("Voltar para Lista", on_click=sair_do_modo_edicao)
+            st.button("Voltar para Lista", on_click=sair_do_modo_edicao_condominio)
 
-#------------------DETALHAMENTO DO CONDOMINIO------------------
-elif st.session_state.details_mode:
+#------------------MODO DE DETALHAMENTO DO CONDOMINIO------------------
+elif st.session_state.details_condominio_mode:
+    st.button("Voltar para Listagem de Condomínios", on_click=sair_para_listagem_condominio, key="btn_back_details")
+
     cnpj_para_detalhar = st.session_state.detail_cnpj
     dados_condominio = obter_condominio_por_cnpj(cnpj_para_detalhar)
     empregados = obter_empregados(cnpj_para_detalhar)
-    
+
     if dados_condominio:
         nome_condominio, logradouro, bairro, cidade, uf, cep = dados_condominio
         st.title(f"{nome_condominio}")
-        st.caption(f"Logradouro: {logradouro}")
-        st.caption(f"Bairro: {bairro}")
-        st.caption(f"Cidade: {cidade}")
-        st.caption(f"UF: {uf}")
-        st.caption(f"CEP: {cep}")
+        st.caption(f"Logradouro: {logradouro}; Bairro: {bairro}; Cidade: {cidade}; UF: {uf}")
 
-        st.header("Empregados")
+        col_titulo, col_botao = st.columns([2, 1], vertical_alignment="bottom")
+
+        with col_titulo:
+            st.header("Empregados")
+
+        with col_botao:
+            cadastrar_empregado_clicked = st.button("Cadastrar empregado", key="bton_cadastrar_empregado", help="Cadastrar novo funcionário")
+
         c1, c2, c3, c4, c5 = st.columns([3, 2, 1, 1.5, 1.5])
         c1.markdown("**Nome**")
         c2.markdown("**Cargo**")
         c3.markdown("**Matrícula**")
         c4.markdown("**Admissão**")
-        c5.markdown("**Salário**")
-        st.divider()
+        c5.markdown("**Salário**")            
 
         if empregados:
             with st.container(height=300, border=False):
@@ -265,7 +339,13 @@ elif st.session_state.details_mode:
                         st.write(f"R$ {sal_emp}")
         else:
             st.info("Nenhum empregado cadastrado neste condomínio.")
-#------------------MODO DE LISTAGEM------------------
+        
+        if cadastrar_empregado_clicked:
+            st.session_state.create_empregado_mode = True
+            st.rerun()
+
+
+#------------------MODO LISTAGEM DE CONDOMINIOS------------------
 else:
     # HEADER ADMINISTRADOR
     with st.container(border=True):
@@ -312,7 +392,7 @@ else:
                         detalhes_clicked = st.button(":material/visibility:", key=f"btn_info_{cnpj_condominio}", help="Mais informações")
 
                         if detalhes_clicked:
-                            st.session_state.details_mode = True
+                            st.session_state.details_condominio_mode = True
                             st.session_state.detail_cnpj = cnpj_condominio
                             st.rerun()
                     
@@ -322,7 +402,7 @@ else:
 
                         if editar_clicked:
                             # Define o estado de edição e força o reinício (rerun)
-                            st.session_state.edit_mode = True
+                            st.session_state.edit_condominio_mode = True
                             st.session_state.editing_cnpj = cnpj_condominio
                             st.rerun()
 
@@ -337,7 +417,7 @@ else:
             cadastrar_clicked = st.button("Cadastrar +",  help="Cadastrar novo condomínio", use_container_width=True)
 
             if cadastrar_clicked:
-                st.session_state.create_mode = True
+                st.session_state.create_condominio_mode = True
                 st.rerun()
 
 
