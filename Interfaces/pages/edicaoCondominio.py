@@ -22,7 +22,7 @@ if 'cnpj_edicao' not in st.session_state or st.session_state.cnpj_edicao is None
 cnpj_atual = st.session_state.cnpj_edicao
 
 # Botão de Voltar (Topo)
-if st.button("⬅️ Cancelar e Voltar"):
+if st.button("Cancelar e Voltar"):
     voltar_home()
 
 st.title("Editar Condomínio")
@@ -59,7 +59,7 @@ if dados:
     # --- LÓGICA DE SALVAR (FORA DO WITH, MAS DENTRO DO IF DADOS) ---
     if salvar:
         if not novo_nome:
-            st.warning("⚠️ O nome não pode ficar vazio.")
+            st.warning("O nome não pode ficar vazio.")
         else:
             try:
                 sucesso = atualizar_condominio(
@@ -67,7 +67,7 @@ if dados:
                 )
                 
                 if sucesso:
-                    st.success("✅ Condomínio atualizado com sucesso! Redirecionando...")
+                    st.success("Condomínio atualizado com sucesso! Redirecionando...")
                     time.sleep(1.5) # Dá tempo do usuário ler a mensagem
                     voltar_home()   # Chama a função que limpa o estado e navega
                 else:

@@ -2,7 +2,7 @@ import streamlit as st
 import mysql.connector
 from db_functions import get_db_connection, deletar_condominio, listar_condominios, deletar_condominio, obter_condominio_por_cnpj
 # =========================================================================
-# 1. CONFIGURAÇÃO E CONEXÃO COM BANCO DE DADOS
+# CONFIGURAÇÃO E CONEXÃO COM BANCO DE DADOS
 # =========================================================================
 
 conexao = get_db_connection()
@@ -11,7 +11,7 @@ cursor = conexao.cursor()
 admin_name = "Admin"
 admin_email = "admin@sistema.com"
 
-# ------------------ 5. LISTAGEM PRINCIPAL (DEFAULT) ------------------
+# ------------------ LISTAGEM PRINCIPAL ------------------
 with st.container(border=True):
     c1, c2, c3, c4 = st.columns([0.8, 4, 0.5, 0.5], vertical_alignment="center")
     c1.image("https://cdn-icons-png.flaticon.com/512/3135/3135715.png", width=50)
