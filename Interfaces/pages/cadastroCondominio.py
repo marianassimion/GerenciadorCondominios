@@ -4,11 +4,9 @@ import time
 
 st.set_page_config(page_title="Novo Condomínio")
 
-# Título
 st.title("Novo Condomínio")
 st.markdown("Preencha os dados abaixo para registrar um novo condomínio.")
 
-# Botão de Voltar
 if st.button("Voltar para Listagem"):
     st.switch_page("home.py")
 
@@ -28,17 +26,16 @@ with st.form("form_cadastro_condominio"):
     uf = c4.text_input("UF", max_chars=2)
     cep = c5.text_input("CEP")
 
-    # Botão de Enviar
     submitted = st.form_submit_button("Salvar Cadastro", type="primary", use_container_width=True)
 
 # ---  SALVAR ---
 if submitted:
-    # 1. Validação simples
+    # Validação
     if not nome or not cnpj:
         st.warning("Os campos **Nome** e **CNPJ** são obrigatórios.")
     
     else:
-        # 2. Tenta salvar no banco
+        # Tenta salvar no db
         sucesso = criar_condominio(nome, cnpj, logradouro, bairro, cidade, uf, cep)
         
         if sucesso:
