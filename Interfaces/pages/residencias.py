@@ -1,6 +1,6 @@
 import streamlit as st
 import time
-from db_controller import listar_residencias, obter_condominio_por_cnpj, deletar_residencia, login_sessao
+from db_functions import listar_residencias, obter_condominio_por_cnpj, deletar_residencia, login_sessao
 
 st.set_page_config(page_title="Residências", layout="centered")
 

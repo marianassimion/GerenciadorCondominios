@@ -1,9 +1,8 @@
 import streamlit as st
 import time
-from db_controller import login_sessao, obter_condominio_por_cnpj, obter_empregados, deletar_empregado
+from db_functions import login_sessao, obter_condominio_por_cnpj, obter_empregados, deletar_empregado
 
 st.set_page_config(page_title="Detalhes do Condomínio")
-
 
 login_sessao()
 

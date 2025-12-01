@@ -1,6 +1,6 @@
 import streamlit as st
 import time
-from db_controller import login_sessao, criar_residencia
+from db_functions import login_sessao, criar_residencia
 
 st.set_page_config(page_title="Casdastro de Residências", layout="centered")
 

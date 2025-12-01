@@ -1,5 +1,5 @@
 import streamlit as st
-from db_controller import get_db_connection, criar_condominio
+from db_functions import get_db_connection, criar_condominio
 import time
 
 conexao = get_db_connection()

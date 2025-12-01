@@ -1,6 +1,6 @@
 import streamlit as st
 import time
-from db_controller import obter_empregado_por_cpf, atualizar_empregado
+from db_functions import obter_empregado_por_cpf, atualizar_empregado
 
 st.set_page_config(page_title="Editar Empregado")
 
@@ -8,7 +8,7 @@ st.set_page_config(page_title="Editar Empregado")
 if 'editing_cpf' not in st.session_state or st.session_state.editing_cpf is None:
     st.warning("Nenhum empregado selecionado para edição.")
     if st.button("Voltar para Home"):
-        st.switch_page("home.py")
+        st.switch_page("pages/home.py")
     st.stop()
 
 # Recupera o CPF da sessão
@@ -57,6 +57,6 @@ if dados:
                 time.sleep(1)
                 # IMPORTANTE: Definir que queremos ver os detalhes ao voltar
                 st.session_state.details_condominio_mode = True 
-                st.switch_page("home.py")
+                st.switch_page("pages/detalharCondominio.py")
 else:
     st.error("Empregado não encontrado.")

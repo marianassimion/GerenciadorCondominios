@@ -1,5 +1,5 @@
 import streamlit as st
-from db_controller import *
+from db_functions import *
 
 # Conexão com o banco de dados
 conexao = get_db_connection()
