@@ -3,7 +3,9 @@ import streamlit as st
 import bcrypt
 import time
 from pages.config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME 
+import time
 
+# Conexão com o banco de dados
 @st.cache_resource
 def get_db_connection():
     try:
@@ -16,12 +18,35 @@ def get_db_connection():
 
 conexao = get_db_connection()
 
-# Cada função deve criar o seu próprio cursor.
+# Login
+def verificar_login(email, senha_digitada):
+    cursor = conexao.cursor(buffered=True)
+    try:
+        comando = "SELECT id_administrador, nome, email, senha FROM ADMINISTRADOR WHERE email = %s"
+        cursor.execute(comando, (email,))
+        usuario = cursor.fetchone()
+        if usuario:
+            id_admin, nome, email_db, senha_hash_banco = usuario
+            if isinstance(senha_hash_banco, str):
+                senha_hash_banco = senha_hash_banco.encode('utf-8')
+            if bcrypt.checkpw(senha_digitada.encode('utf-8'), senha_hash_banco):
+                return (nome, email_db)
+        return None 
 
-# =========================================================================
-# FUNÇÕES DE BANCO DE DADOS
-# =========================================================================
+    except mysql.connector.Error as err:
+        st.error(f"Erro no login: {err}")
+        return None
+    finally:
+        cursor.close()
 
+def login_sessao():
+    if not st.session_state.get('logged_in'):
+        st.error("Acesso negado. Por favor, faça login.")
+        time.sleep(3) 
+        st.switch_page("login.py")
+        st.stop() 
+
+# Condomínio
 def listar_condominios():
     cursor = conexao.cursor(buffered=True) 
     try:
@@ -40,18 +65,6 @@ def obter_condominio_por_cnpj(cnpj):
         return cursor.fetchone()
     except mysql.connector.Error:
         return None
-    finally:
-        cursor.close()
-
-def obter_empregados(cnpj_condominio):
-    cursor = conexao.cursor(buffered=True)
-    comando = "SELECT nome, cargo, matricula, data_admissao, salario, cpf FROM EMPREGADO WHERE condominio_cnpj = %s"
-    try:
-        cursor.execute(comando, (cnpj_condominio,))
-        return cursor.fetchall()
-    except mysql.connector.Error as err:
-        st.error(f"Erro ao buscar empregados: {err}")
-        return []
     finally:
         cursor.close()
 
@@ -93,6 +106,7 @@ def deletar_condominio(cnpj):
     finally:
         cursor.close()
 
+# Empregado
 def criar_empregado(cpf, nome, cargo, matricula, data_admissao, salario, condominio_cnpj):
     cursor = conexao.cursor(buffered=True)
     try:
@@ -196,26 +210,117 @@ def listar_avisos():
 # FUNÇÃO DE LOGIN 
 # =========================================================================
 
-def verificar_login(email, senha_digitada):
-    cursor = conexao.cursor(buffered=True)
+# def verificar_login(email, senha_digitada):
+#     cursor = conexao.cursor(buffered=True)
+#     comando = "SELECT nome, cargo, matricula, data_admissao, salario, cpf FROM EMPREGADO WHERE condominio_cnpj = %s"
+#     try:
+#         cursor.execute(comando, (cnpj_condominio,))
+#         return cursor.fetchall()
+#     except mysql.connector.Error as err:
+#         st.error(f"Erro ao buscar empregados: {err}")
+#         return []
+#     finally:
+#         cursor.close()
+
+# Residência
+def listar_residencias(cnpj_condominio):
+    cursor = conexao.cursor(buffered=True) 
     try:
-        comando = "SELECT id_administrador, nome, email, senha FROM ADMINISTRADOR WHERE email = %s"
-        cursor.execute(comando, (email,))
-        usuario = cursor.fetchone()
-
-        if usuario:
-            id_admin, nome, email_db, senha_hash_banco = usuario
-            
-            if isinstance(senha_hash_banco, str):
-                senha_hash_banco = senha_hash_banco.encode('utf-8')
-
-            if bcrypt.checkpw(senha_digitada.encode('utf-8'), senha_hash_banco):
-                return (id_admin, nome, email_db)
-            
-        return None 
-
+        sql = """
+            SELECT id_residencia, num_unidade, bloco, tipo 
+            FROM RESIDENCIA 
+            WHERE condominio_cnpj = %s
+            ORDER BY bloco, num_unidade
+        """
+    
+        cursor.execute(sql, (cnpj_condominio,))
+        return cursor.fetchall()
+    
     except mysql.connector.Error as err:
-        st.error(f"Erro no login: {err}")
-        return None
+        st.error(f"Erro ao buscar residências: {err}")
+        return []
+        
+    finally:
+        cursor.close()
+
+def buscar_residencias(cnpj_condominio, unidade=""):
+    conexao = get_db_connection()
+    cursor = conexao.cursor(dictionary=True) 
+    try:
+        if unidade:
+            sql = """
+                SELECT id_residencia, num_unidade, bloco, tipo 
+                FROM RESIDENCIA 
+                WHERE condominio_cnpj = %s 
+                AND (CAST(num_unidade AS CHAR) LIKE %s OR bloco LIKE %s)
+                ORDER BY bloco, num_unidade
+            """
+            busca_unidade = f"%{unidade}%"
+            cursor.execute(sql, (cnpj_condominio, busca_unidade, busca_unidade))
+        else:
+            sql = """
+                SELECT id_residencia, num_unidade, bloco, tipo 
+                FROM RESIDENCIA 
+                WHERE condominio_cnpj = %s
+                ORDER BY bloco, num_unidade
+            """
+            cursor.execute(sql, (cnpj_condominio,))
+            
+        return cursor.fetchall()
+    
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao buscar residências: {err}")
+        return []
+        
+    finally:
+        cursor.close()
+        conexao.close()
+
+def criar_residencia(num_unidade, bloco, tipo, condominio_cnpj):
+    cursor = conexao.cursor()
+    try:
+        cmd = "INSERT INTO RESIDENCIA (num_unidade, bloco, tipo, condominio_cnpj) VALUES (%s, %s, %s, %s)"
+        cursor.execute(cmd, (num_unidade, bloco, tipo, condominio_cnpj))
+        conexao.commit()
+        return True
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao criar: {err}")
+        return False
+    finally:
+        cursor.close()
+
+def editar_residencia(id_residencia, num_unidade, bloco, tipo):
+    conexao = get_db_connection()
+    cursor = conexao.cursor()
+    try:
+        cmd = """
+            UPDATE RESIDENCIA 
+            SET num_unidade = %s, bloco = %s, tipo = %s 
+            WHERE id_residencia = %s
+        """
+        cursor.execute(cmd, (num_unidade, bloco, tipo, id_residencia))
+        conexao.commit()
+        return True
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao atualizar: {err}")
+        return False
+    finally:
+        cursor.close()
+
+def deletar_residencia(id_residencia):
+    conexao = get_db_connection()
+    cursor = conexao.cursor()
+    try:
+        cursor.execute("DELETE FROM MULTA WHERE id_residencia = %s", (id_residencia,))
+        cursor.execute("DELETE FROM TAXA WHERE id_residencia = %s", (id_residencia,))
+        cursor.execute("UPDATE MORADOR SET id_residencia = NULL WHERE id_residencia = %s", (id_residencia,))
+        cursor.execute("DELETE FROM RESIDENCIA WHERE id_residencia = %s", (id_residencia,))
+        
+        conexao.commit()
+        return True
+    except Exception as e:
+        conexao.rollback() 
+        st.error(f"Erro ao deletar: {e}")
+        return False
     finally:
         cursor.close()

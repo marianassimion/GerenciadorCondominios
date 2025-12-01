@@ -8,10 +8,9 @@ conexao = mysql.connector.connect(
 )
 cursor = conexao.cursor()
 
-email = "mari@condo.com"
-nome = "Mariana"
-senha_texto = "123456" 
-
+email = "rute@condo.com"
+nome = "Rute"
+senha_texto = "123" 
 
 # Gera o Hash
 salt = bcrypt.gensalt()
