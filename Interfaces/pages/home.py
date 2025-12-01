@@ -46,9 +46,9 @@ with st.container(height=400, border=True):
                 st.rerun()
                 
             if c_del.button(":material/delete:", key=f"del_{cnpj_c}", help="Excluir condomínio"):
+                print('apertou excluir')
                 if deletar_condominio(cnpj_c):
                     st.success("Condomínio excluído!") 
-                    st.time.sleep(1)
                     st.rerun()
                     
 

@@ -9,7 +9,7 @@ def voltar_home():
     # Limpa a variável de edição para não dar conflito na próxima vez
     if 'cnpj_edicao' in st.session_state:
         del st.session_state['cnpj_edicao']
-    st.switch_page("home.py") # Verifique se o nome do arquivo é exatamente este (maiúsculas/minúsculas importam)
+    st.switch_page("pages/home.py") # Verifique se o nome do arquivo é exatamente este (maiúsculas/minúsculas importam)
 
 # --- VERIFICAÇÃO DE SEGURANÇA ---
 if 'cnpj_edicao' not in st.session_state or st.session_state.cnpj_edicao is None:

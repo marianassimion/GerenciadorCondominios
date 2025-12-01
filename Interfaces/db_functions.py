@@ -98,9 +98,34 @@ def deletar_condominio(cnpj):
     cursor = conexao.cursor(buffered=True)
     try:
         cursor.execute("DELETE FROM CONDOMINIO WHERE cnpj = %s", (cnpj,))
+        cursor.execute("SELECT id_residencia FROM RESIDENCIA WHERE condominio_cnpj = %s", (cnpj,))
+        residencias = cursor.fetchall()
+        
+        for (id_res,) in residencias:
+            # Apaga dependências da residência
+            cursor.execute("DELETE FROM MULTA WHERE id_residencia = %s", (id_res,))
+            cursor.execute("DELETE FROM TAXA WHERE id_residencia = %s", (id_res,))
+            cursor.execute("DELETE FROM VISITANTE WHERE id_residencia = %s", (id_res,))
+            cursor.execute("SELECT cpf FROM MORADOR WHERE id_residencia = %s", (id_res,))
+            moradores = cursor.fetchall()
+            for (cpf_morador,) in moradores:
+                cursor.execute("DELETE FROM VEICULO WHERE morador_cpf = %s", (cpf_morador,))
+                cursor.execute("DELETE FROM TELEFONE_MORADOR WHERE cpf = %s", (cpf_morador,))
+            
+            cursor.execute("DELETE FROM MORADOR WHERE id_residencia = %s", (id_res,))
+            cursor.execute("DELETE FROM RESIDENCIA WHERE id_residencia = %s", (id_res,))
+
+        cursor.execute("DELETE FROM CONDOMINIO WHERE cnpj = %s", (cnpj,))
+        
         conexao.commit()
         return True
-    except mysql.connector.Error:
+    
+    except mysql.connector.Error as err:
+        if err.errno == 1451:  # Foreign key constraint
+            st.error("Não é possível excluir este condomínio pois existem registros associados, como empregados, moradores, residências, veículos ou taxas.")
+        else:
+            st.error(f"Erro ao deletar condomínio: {err}")
+        
         conexao.rollback()
         return False
     finally:
