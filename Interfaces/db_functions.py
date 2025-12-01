@@ -183,7 +183,7 @@ def obter_empregados(condominio_cnpj):
 def obter_empregado_por_cpf(cpf):
     cursor = conexao.cursor(buffered=True)
     try:
-        cursor.execute("SELECT nome, cargo, matricula, data_admissao, salario, cpf FROM EMPREGADO WHERE cpf = %s", (cpf,))
+        cursor.execute("SELECT nome, cargo, matricula, data_admissao, salario, cpf, foto FROM EMPREGADO WHERE cpf = %s", (cpf,))
         return cursor.fetchone()
     except mysql.connector.Error as err:
         st.error(f"Erro ao buscar empregado: {err}")
@@ -191,17 +191,23 @@ def obter_empregado_por_cpf(cpf):
     finally:
         cursor.close()
 
-def atualizar_empregado(cpf_original, nome, cargo, matricula, data_admissao, salario):
+def atualizar_empregado(nome, cargo, matricula, data_admissao, salario, foto, cpf_original ):
     cursor = conexao.cursor(buffered=True)
     try:
-        cmd = "UPDATE EMPREGADO SET nome=%s, cargo=%s, matricula=%s, data_admissao=%s, salario=%s WHERE cpf=%s"
-        cursor.execute(cmd, (nome, cargo, matricula, data_admissao, salario, cpf_original))
+        if foto is None:
+            cursor.execute("SELECT foto FROM EMPREGADO WHERE cpf=%s", (cpf_original,))
+            foto_atual = cursor.fetchone()[0]
+            foto = foto_atual
+        cmd = "UPDATE EMPREGADO SET nome=%s, cargo=%s, matricula=%s, data_admissao=%s, salario=%s, foto=%s WHERE cpf=%s"
+        cursor.execute(cmd, (nome, cargo, matricula, data_admissao, salario, foto, cpf_original ))
         conexao.commit()
         return True
+    
     except mysql.connector.Error as err:
         st.error(f"Erro ao atualizar empregado: {err}")
         conexao.rollback()
         return False
+    
     finally:
         cursor.close()
 
