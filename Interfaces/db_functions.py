@@ -1,6 +1,7 @@
 import mysql.connector
 import streamlit as st
 import bcrypt
+import time
 from pages.config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME 
 
 @st.cache_resource
@@ -188,6 +189,8 @@ def listar_avisos():
         return []
     finally:
         cursor.close()
+
+
 
 # =========================================================================
 # FUNÇÃO DE LOGIN 
