@@ -1,6 +1,7 @@
 import mysql.connector
 import streamlit as st
 import bcrypt
+import time
 from pages.config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME 
 import time
 
@@ -158,17 +159,68 @@ def atualizar_empregado(cpf_original, nome, cargo, matricula, data_admissao, sal
     finally:
         cursor.close()
 
-def obter_empregados(cnpj_condominio):
+def criar_aviso(titulo, texto, id_administrador, condominio_cnpj):
     cursor = conexao.cursor(buffered=True)
-    comando = "SELECT nome, cargo, matricula, data_admissao, salario, cpf FROM EMPREGADO WHERE condominio_cnpj = %s"
     try:
-        cursor.execute(comando, (cnpj_condominio,))
+        comando = f'INSERT INTO AVISO(titulo, texto, id_administrador) VALUES (%s, %s, %s)'
+        valores = (titulo, texto, id_administrador)
+        cursor.execute(comando, valores)
+        conexao.commit()
+        print(f"Aviso '{titulo}' criado com sucesso!")
+        return True
+        
+    except mysql.connector.Error as err:
+        print(f"Erro ao criar aviso: {err}")
+        conexao.rollback()
+        return False
+    finally:
+        cursor.close()
+
+def deletar_aviso(id_aviso):
+    cursor = conexao.cursor(buffered=True)
+    try:
+        cursor.execute("DELETE FROM AVISO WHERE id_aviso = %s", (id_aviso,))
+        conexao.commit()
+        return True
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao deletar aviso: {err}")
+        conexao.rollback()
+        return False
+    finally:
+        cursor.close()
+
+
+def listar_avisos():
+    conexao = get_db_connection()
+    cursor = conexao.cursor()
+    comando = """SELECT aviso.id_aviso, aviso.titulo, aviso.texto, aviso.data_aviso, admin.nome, aviso.condominio_cnpj   FROM AVISO AS aviso JOIN ADMINISTRADOR AS admin ON aviso.id_administrador = admin.id_administrador ORDER BY aviso.data_aviso DESC"""
+    
+    try:
+        cursor.execute(comando)
         return cursor.fetchall()
     except mysql.connector.Error as err:
-        st.error(f"Erro ao buscar empregados: {err}")
+        st.error(f"Erro ao listar avisos: {err}")
         return []
     finally:
         cursor.close()
+
+
+
+# =========================================================================
+# FUNÇÃO DE LOGIN 
+# =========================================================================
+
+# def verificar_login(email, senha_digitada):
+#     cursor = conexao.cursor(buffered=True)
+#     comando = "SELECT nome, cargo, matricula, data_admissao, salario, cpf FROM EMPREGADO WHERE condominio_cnpj = %s"
+#     try:
+#         cursor.execute(comando, (cnpj_condominio,))
+#         return cursor.fetchall()
+#     except mysql.connector.Error as err:
+#         st.error(f"Erro ao buscar empregados: {err}")
+#         return []
+#     finally:
+#         cursor.close()
 
 # Residência
 def listar_residencias(cnpj_condominio):

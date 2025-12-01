@@ -11,7 +11,7 @@ if 'detail_cnpj' not in st.session_state or st.session_state.detail_cnpj is None
     st.warning("Nenhum condomínio selecionado para edição.")
     if st.button("Voltar para Home"): 
         st.switch_page("pages/home.py")
-    st.stop()
+    st.stop() # Para a execução
 
 cnpj_atual = st.session_state.detail_cnpj
 
@@ -30,6 +30,11 @@ if dados_condominio:
     st.caption(f"{log}, {bai} - {cid}/{uf} | CEP: {cep}")
     st.caption(f"CNPJ: {cnpj_atual}")
     st.divider()
+
+    # --- SEÇÃO DE AVISOS ---
+    col_tit, col_btn = st.columns([3, 1], vertical_alignment="bottom")
+    if col_btn.button("Quadro de avisos", use_container_width=True):
+        st.switch_page("pages/listagemAvisos.py")
 
     # --- SEÇÃO DE EMPREGADOS ---
     col_tit, col_btn = st.columns([3, 1], vertical_alignment="bottom")

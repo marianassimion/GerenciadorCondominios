@@ -17,7 +17,7 @@ cpf_atual = st.session_state.editing_cpf
 # Botão de Voltar
 if st.button("Cancelar e Voltar"):
     st.session_state.details_condominio_mode = True # Garante que volta para os detalhes
-    st.switch_page("home.py")
+    st.switch_page("pages/listagemEmpregados.py")
 
 st.title("Editar Empregado")
 

@@ -8,7 +8,7 @@ st.set_page_config(page_title="Novo Empregado")
 # Se não tiver um CNPJ selecionado (veio direto pelo link), manda voltar.
 if 'detail_cnpj' not in st.session_state or st.session_state.detail_cnpj is None:
     st.warning("Nenhum condomínio selecionado.")
-    st.button("Voltar para Home", on_click=lambda: st.switch_page("home.py"))
+    st.button("Voltar para Home", on_click=lambda: st.switch_page("page/listagemEmpregados.py"))
     st.stop()
 
 # Recupera os dados
@@ -17,9 +17,8 @@ dados_condo = obter_condominio_por_cnpj(cnpj_atual)
 nome_condominio = dados_condo[0] if dados_condo else "Não identificado"
 
 # Botão de Voltar
-if st.button("Voltar para Detalhes"):
-    st.session_state.details_condominio_mode = True 
-    st.switch_page("home.py")
+if st.button("Voltar para quadro de funcionários"):
+    st.switch_page("pages/listagemEmpregados.py")
 
 st.title("Novo Colaborador")
 st.write(f"Cadastrando funcionário no condomínio: **{nome_condominio}**")
