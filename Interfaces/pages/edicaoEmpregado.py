@@ -1,6 +1,6 @@
 import streamlit as st
 import time
-from db_functions import obter_empregado_por_cpf, atualizar_empregado
+from db_controller import obter_empregado_por_cpf, atualizar_empregado
 
 st.set_page_config(page_title="Editar Empregado")
 

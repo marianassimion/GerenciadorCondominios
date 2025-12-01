@@ -1,6 +1,6 @@
 import streamlit as st
 import time
-from db_functions import obter_condominio_por_cnpj, atualizar_condominio
+from db_controller import obter_condominio_por_cnpj, atualizar_condominio
 
 st.set_page_config(page_title="Editar Condomínio")
 

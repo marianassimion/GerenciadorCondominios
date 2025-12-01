@@ -1,20 +1,22 @@
 import streamlit as st
 import time
-from db_functions import obter_condominio_por_cnpj, obter_empregados, deletar_empregado
+from db_controller import login_sessao, obter_condominio_por_cnpj, obter_empregados, deletar_empregado
 
 st.set_page_config(page_title="Detalhes do Condomínio")
+
+
+login_sessao()
 
 if 'detail_cnpj' not in st.session_state or st.session_state.detail_cnpj is None:
     st.warning("Nenhum condomínio selecionado para edição.")
     if st.button("Voltar para Home"): 
-        st.switch_page("home.py")
-    st.stop() # Para a execução
+        st.switch_page("pages/home.py")
+    st.stop()
 
-# Pegamos o CNPJ da memória
 cnpj_atual = st.session_state.detail_cnpj
 
 if st.button("Voltar para Home"):
-    st.switch_page("home.py")
+    st.switch_page("pages/home.py")
 
 
 dados_condominio = obter_condominio_por_cnpj(cnpj_atual)
@@ -34,7 +36,6 @@ if dados_condominio:
     col_tit.subheader("Quadro de Funcionários")
     
     if col_btn.button("Novo Empregado", use_container_width=True):
-        # Redireciona para a página de cadastro de empregado
         st.switch_page("pages/cadastroEmpregado.py")
 
     # Cabeçalho da Tabela
@@ -67,7 +68,7 @@ if dados_condominio:
                 with c_del:
                     if st.button(":material/delete:", key=f"del_emp_{cpf_e}", help="Excluir"):
                         if deletar_empregado(cpf_e):
-                            st.success("Funcionário excluído!") #corrgir tamanho
+                            st.success("Funcionário excluído!")
                             time.sleep(1)
                             st.rerun()
                 st.write("---")
