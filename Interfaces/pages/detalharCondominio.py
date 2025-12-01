@@ -43,26 +43,28 @@ if dados_condominio:
         st.switch_page("pages/cadastroEmpregado.py")
 
     # Cabeçalho da Tabela
-    c1, c2, c3, c4, c5, c_edit, c_del = st.columns([2.5, 2, 1.2, 1.5, 1.5, 0.8, 0.8], vertical_alignment="center")
+    c1, c2, c3, c4, c5, c6, c_edit, c_del = st.columns([2.5, 2, 1.2, 1, 1, 1, 0.8, 0.8], vertical_alignment="center")
     c1.markdown("**Nome**")
     c2.markdown("**Cargo**")
     c3.markdown("**Matrícula**")
     c4.markdown("**Admissão**")
     c5.markdown("**Salário**")
+    c6.markdown("**Foto**")
     st.markdown("<hr style='margin: 5px 0; border: none; border-top: 1px solid #333; opacity: 0.2;'>", unsafe_allow_html=True)
 
     if empregados:
         with st.container(height=400, border=False):
             for emp in empregados:
-                # Recupera dados (incluindo CPF no índice 5)
-                nome_e, cargo_e, mat_e, data_e, sal_e, cpf_e = emp
+                nome_e, cargo_e, mat_e, data_e, sal_e, cpf_e, foto_e = emp
 
-                c1, c2, c3, c4, c5, c_edit, c_del = st.columns([2.5, 2, 1.2, 1.5, 1.5, 0.8, 0.8], vertical_alignment="center")
+                c1, c2, c3, c4, c5, c6, c_edit, c_del = st.columns([2.5, 2, 1.2, 1, 1, 1, 0.8, 0.8], vertical_alignment="center")
                 c1.write(nome_e)
                 c2.write(cargo_e)
                 c3.write(str(mat_e))
                 c4.write(str(data_e))
                 c5.write(f"R$ {sal_e}")
+                if foto_e:
+                    c6.image(foto_e, width =1080)
                 
                 with c_edit:
                     if st.button(":material/edit_square:", key=f"edit_emp_{cpf_e}", help="Editar funcionário"):

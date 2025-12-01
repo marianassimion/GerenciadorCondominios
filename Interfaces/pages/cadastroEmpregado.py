@@ -36,7 +36,9 @@ with st.form(key='cadastro_empregado_form'):
     matricula = c3.text_input('Matrícula')
     data_admissao = c4.date_input('Data de Admissão')
     salario = c5.number_input('Salário', min_value=0.0, step=100.0)
-    
+
+    foto = st.file_uploader("Foto do funcionário", type=["jpg", "jpeg", "png"])
+
     enviado = st.form_submit_button('Salvar Cadastro', type="primary", use_container_width=True)
 
 # --- LÓGICA DE SALVAR ---
@@ -49,12 +51,14 @@ if enviado:
         
         if len(cpf_limpo) > 11:
             st.error("CPF inválido (muitos dígitos).")
+
         else:
-            sucesso = criar_empregado(cpf_limpo, nome, cargo, matricula, data_admissao, salario, cnpj_atual)
+            foto_bytes = foto.read() if foto is not None else None
+            sucesso = criar_empregado(cpf_limpo, nome, cargo, matricula, data_admissao, salario, cnpj_atual, foto_bytes)
             
             if sucesso:
                 st.success(f"Funcionário **{nome}** cadastrado com sucesso!")
                 time.sleep(1.5)
                 # Volta para a home, garantindo que o modo de detalhes esteja ativo
                 st.session_state.details_condominio_mode = True
-                st.switch_page("home.py")
+                st.switch_page("pages/home.py")
