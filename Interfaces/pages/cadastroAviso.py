@@ -2,11 +2,6 @@ import streamlit as st
 from db_functions import criar_aviso, obter_condominio_por_cnpj
 import time
 
-st.set_page_config(page_title="Novo Aviso")
-st.title("Novo Aviso")
-st.markdown("Preencha os dados abaixo para registrar um novo aviso.")
-
-
 if 'usuario' not in st.session_state or st.session_state.usuario is None:
     st.warning("Você precisa estar logado.")
     st.stop()
@@ -20,8 +15,8 @@ if 'detail_cnpj' not in st.session_state or st.session_state.detail_cnpj is None
     st.button("Voltar para Home", on_click=lambda: st.switch_page("home.py"))
     st.stop()
 
-if st.button("Voltar para Condomínio"):
-    st.switch_page("pages/detalharCondominio.py")
+if st.button("Voltar para o Quadro de Avisos"):
+    st.switch_page("pages/listagemAvisos.py")
 
 cnpj_atual = st.session_state.detail_cnpj
 dados_condo = obter_condominio_por_cnpj(cnpj_atual)

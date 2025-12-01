@@ -144,8 +144,6 @@ def atualizar_empregado(cpf_original, nome, cargo, matricula, data_admissao, sal
     finally:
         cursor.close()
 
-
-
 def criar_aviso(titulo, texto, id_administrador, condominio_cnpj):
     cursor = conexao.cursor(buffered=True)
     try:
@@ -163,12 +161,39 @@ def criar_aviso(titulo, texto, id_administrador, condominio_cnpj):
     finally:
         cursor.close()
 
+def deletar_aviso(id_aviso):
+    cursor = conexao.cursor(buffered=True)
+    try:
+        cursor.execute("DELETE FROM AVISO WHERE id_aviso = %s", (id_aviso,))
+        conexao.commit()
+        return True
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao deletar aviso: {err}")
+        conexao.rollback()
+        return False
+    finally:
+        cursor.close()
+
+
+def listar_avisos():
+    conexao = get_db_connection()
+    cursor = conexao.cursor()
+    comando = """SELECT aviso.id_aviso, aviso.titulo, aviso.texto, aviso.data_aviso, admin.nome, aviso.condominio_cnpj   FROM AVISO AS aviso JOIN ADMINISTRADOR AS admin ON aviso.id_administrador = admin.id_administrador ORDER BY aviso.data_aviso DESC"""
+    
+    try:
+        cursor.execute(comando)
+        return cursor.fetchall()
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao listar avisos: {err}")
+        return []
+    finally:
+        cursor.close()
+
 # =========================================================================
 # FUNÇÃO DE LOGIN 
 # =========================================================================
 
 def verificar_login(email, senha_digitada):
-    # Usamos buffered=True aqui também!
     cursor = conexao.cursor(buffered=True)
     try:
         comando = "SELECT id_administrador, nome, email, senha FROM ADMINISTRADOR WHERE email = %s"
