@@ -1,6 +1,6 @@
 import streamlit as st
 import time
-from db_controller import criar_empregado, obter_condominio_por_cnpj
+from db_functions import criar_empregado, obter_condominio_por_cnpj
 
 st.set_page_config(page_title="Novo Empregado")
 

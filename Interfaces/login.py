@@ -1,6 +1,6 @@
 import streamlit as st
 import time
-from db_controller import verificar_login 
+from db_functions import verificar_login 
 
 # ------------ LOGIN ------------
 st.set_page_config(page_title="Login", layout="centered")

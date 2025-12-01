@@ -134,6 +134,22 @@ def deletar_empregado(cpf):
     finally:
         cursor.close()
 
+def obter_empregados(condominio_cnpj):
+    cursor = conexao.cursor(buffered=True)
+    comando = "SELECT nome, cargo, matricula, data_admissao, salario, cpf FROM EMPREGADO WHERE condominio_cnpj = %s"
+
+    try:
+        cursor.execute(comando, (condominio_cnpj,))
+        resultados = cursor.fetchall()
+        return resultados
+    
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao buscar empregados: {err}")
+        return None
+    
+    finally:
+        cursor.close()
+
 def obter_empregado_por_cpf(cpf):
     cursor = conexao.cursor(buffered=True)
     try:
