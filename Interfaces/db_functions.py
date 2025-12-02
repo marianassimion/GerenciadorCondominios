@@ -369,55 +369,9 @@ def deletar_residencia(id_residencia):
         cursor.close()
 
 # Morador
-def listar_moradores_por_residencia(id_residencia):
-    # Usa a conexão global criada no início do arquivo
-    cursor = conexao.cursor(buffered=True) 
-    try:
-        # Adicionado foto_perfil na consulta
-        sql = """
-            SELECT cpf, nome, Email, sindico, foto_perfil 
-            FROM MORADOR 
-            WHERE id_residencia = %s"""
-        cursor.execute(sql, (id_residencia,))
-        return cursor.fetchall()
-    except mysql.connector.Error as err:
-        st.error(f"Erro ao buscar moradores da residência: {err}")
-        return []
-    finally:
-        cursor.close()
-        # NÃO FECHAR A CONEXÃO AQUI, pois ela é global
-
-def criar_morador(cpf, nome, email, id_residencia, is_sindico, lista_telefones, foto_bytes):
-    # Aqui criamos uma nova conexão temporária para garantir transação segura (como no seu original)
-    conn_temp = get_db_connection()
-    cursor = conn_temp.cursor()
-    try:
-        # Adicionado foto_perfil (BLOB)
-        sql_morador = """
-            INSERT INTO MORADOR (cpf, nome, Email, id_residencia, sindico, foto_perfil) 
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """
-        cursor.execute(sql_morador, (cpf, nome, email, id_residencia, is_sindico, foto_bytes))
-        
-        sql_tel = "INSERT INTO TELEFONE_MORADOR (cpf_morador, numero) VALUES (%s, %s)"
-        for tel in lista_telefones:
-            if tel.strip(): 
-                cursor.execute(sql_tel, (cpf, tel.strip()))
-        
-        conn_temp.commit()
-        return True
-    except mysql.connector.Error as err:
-        conn_temp.rollback() 
-        st.error(f"Erro ao cadastrar morador: {err}")
-        return False
-    finally:
-        cursor.close()
-        conn_temp.close()
-
 def deletar_morador(cpf):
     cursor = conexao.cursor(buffered=True)
     try:
-        # CORREÇÃO: Nome da tabela ajustado para TELEFONE_MORADOR
         cursor.execute("DELETE FROM TELEFONE_MORADOR WHERE cpf_morador = %s", (cpf,))
         cursor.execute("DELETE FROM VEICULO WHERE morador_cpf = %s", (cpf,))
         cursor.execute("DELETE FROM MORADOR WHERE cpf = %s", (cpf,))
