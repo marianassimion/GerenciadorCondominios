@@ -459,11 +459,11 @@ def criar_area_comum(nome, descricao, capacidade, condominio_cnpj):
         cursor.close()
 
 # --- [READ] ---
-def obter_area_comum(condominio_cnpj):
+def obter_area_comum(id_a):
     cursor = conexao.cursor(buffered=True)
-    comando = "SELECT id_area_comum, nome, descricao, capacidade FROM AREA_COMUM WHERE condominio_cnpj = %s"
+    comando = "SELECT nome, descricao, capacidade FROM AREA_COMUM WHERE id_area_comum = %s"
     try:
-        cursor.execute(comando, (condominio_cnpj,))
+        cursor.execute(comando, (id_a,))
         return cursor.fetchall()
     except mysql.connector.Error as err:
         st.error(f"Erro ao buscar áreas comuns: {err}")
@@ -471,12 +471,12 @@ def obter_area_comum(condominio_cnpj):
     finally:
         cursor.close()
 
-def listar_areas_comuns():
+def listar_areas_comuns(condominio_cnpj):
     local_conexao = get_db_connection()
     cursor = local_conexao.cursor()
-    comando = """SELECT id_area_comum, nome, descricao, capacidade, condominio_cnpj FROM AREA_COMUM """
+    comando = """SELECT id_area_comum, nome, descricao, capacidade FROM AREA_COMUM WHERE condominio_cnpj = %s """
     try:
-        cursor.execute(comando)
+        cursor.execute(comando, (condominio_cnpj, ))
         return cursor.fetchall()
     except mysql.connector.Error as err:
         st.error(f"Erro ao listar áreas comuns: {err}")
@@ -485,12 +485,11 @@ def listar_areas_comuns():
         cursor.close()
 
 # --- [UPDATE] ---
-def atualizar_area_comum(id_areacomum, nome, descricao, capacidade, condomimio_cnpj):
+def atualizar_area_comum(id_area_comum, nome, descricao, capacidade):
     cursor = conexao.cursor(buffered=True)
+    cmd = "UPDATE AREA_COMUM SET nome=%s, descricao=%s, capacidade=%s WHERE id_area_comum=%s"
     try:
-        
-        cmd = "UPDATE AREA_COMUM SET nome=%s, descricao=%s, capacidade=%s WHERE id_areacomum=%s"
-        cursor.execute(cmd, (nome, descricao, capacidade, id_areacomum))
+        cursor.execute(cmd, (nome, descricao, capacidade, id_area_comum))
         conexao.commit()
         return True
     
@@ -503,10 +502,10 @@ def atualizar_area_comum(id_areacomum, nome, descricao, capacidade, condomimio_c
         cursor.close()
 
 # --- [DELETE] ---
-def deletar_area_comum(condominio_cnpj):
+def deletar_area_comum(id_area_comum):
     cursor = conexao.cursor(buffered=True)
     try:
-        cursor.execute("DELETE FROM AREACOMUM WHERE id_areacomum=%s", (condominio_cnpj,))
+        cursor.execute("DELETE FROM AREA_COMUM WHERE id_area_comum=%s", (id_area_comum,))
         conexao.commit()
         return True
     except mysql.connector.Error as err:

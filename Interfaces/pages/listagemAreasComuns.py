@@ -1,6 +1,6 @@
 import streamlit as st
 import time
-from db_functions import obter_condominio_por_cnpj, obter_area_comum, deletar_area_comum, atualizar_area_comum, criar_area_comum
+from db_functions import obter_condominio_por_cnpj, listar_areas_comuns, deletar_area_comum, criar_area_comum, obter_area_comum
 
 st.set_page_config(page_title="Listagem de Áreas comuns")
 
@@ -17,7 +17,7 @@ if st.button("Voltar para Condomínio"):
     st.switch_page("pages/detalharCondominio.py")
 
 dados_condominio = obter_condominio_por_cnpj(cnpj_atual)
-areas_comuns = obter_area_comum(cnpj_atual)
+areas_comuns = listar_areas_comuns(cnpj_atual)
 nome_condominio = dados_condominio[0] if dados_condominio else "Não identificado"
 
 col_tit, col_btn = st.columns([3, 1], vertical_alignment="bottom")
@@ -38,18 +38,18 @@ if areas_comuns:
                 c_content, c_edit, c_del = st.columns([0.8, 0.1, 0.1])
                 
                 with c_content:
-                    st.markdown(f"**{nome_a}** <span style='color:grey; font-size:0.8em;'> • </span>", unsafe_allow_html=True)
-                    st.markdown(f"#### {desc_a}")
+                    st.markdown(f"#### {nome_a} ", unsafe_allow_html=True)
+                    st.markdown(f"{desc_a}")
                     st.write(cap_a)
 
                 with c_del:
                     if st.button(":material/delete:", key=f"del_area_comum_{id_a}", help="Excluir essa área comum"):
                         if deletar_area_comum(id_a):
                             st.toast("Área comum excluída!")
-                            time.sleep(1)
+                            time.sleep(2)
                             st.rerun()
 
                 with c_edit:
                     if st.button(":material/edit_square:", key=f"edit_area_comum_{id_a}", help="Editar essa área comum"):
-                        st.session_state.area_comum_editando = id_a
+                        st.session_state.editing_area_comum = id_a
                         st.switch_page("pages/edicaoAreaComum.py")
