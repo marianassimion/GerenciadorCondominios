@@ -68,11 +68,11 @@ def login_sessao():
 # ==============================================================================
 
 # --- [CREATE] ---
-def criar_condominio(nome, id_admin, cnpj, logradouro, bairro, cidade, uf, cep):
+def criar_condominio(cnpj, nome, logradouro, bairro, cidade, uf, cep):
     cursor = conexao.cursor(buffered=True)
     try:
-        cmd = "INSERT INTO condominio (nome, id_admin, cnpj, logradouro, bairro, cidade, uf, cep) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-        cursor.execute(cmd, (nome, id_admin, cnpj, logradouro, bairro, cidade, uf, cep))
+        cmd = "INSERT INTO condominio (cnpj, nome,  logradouro, bairro, cidade, uf, cep) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(cmd, (cnpj, nome,  logradouro, bairro, cidade, uf, cep))
         conexao.commit()
         return True
     except mysql.connector.Error:
@@ -186,6 +186,7 @@ def criar_empregado(cpf, nome, cargo, matricula, data_admissao, salario, cnpj_at
         cursor.close()
 
 # --- [READ] ---
+
 def obter_empregados(condominio_cnpj):
     cursor = conexao.cursor(buffered=True)
     comando = "SELECT nome, cargo, matricula, data_admissao, salario, cpf, foto FROM EMPREGADO WHERE condominio_cnpj = %s"

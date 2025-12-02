@@ -19,7 +19,6 @@ if st.button("Voltar para Home"):
 
 
 dados_condominio = obter_condominio_por_cnpj(cnpj_atual)
-empregados = obter_empregados(cnpj_atual)
 
 if dados_condominio:
     nome, log, bai, cid, uf, cep = dados_condominio

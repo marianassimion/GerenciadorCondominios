@@ -40,7 +40,7 @@ if areas_comuns:
                 with c_content:
                     st.markdown(f"#### {nome_a} ", unsafe_allow_html=True)
                     st.markdown(f"{desc_a}")
-                    st.write(cap_a)
+                    st.write(f"Capacidade: {cap_a} pessoas")
 
                 with c_del:
                     if st.button(":material/delete:", key=f"del_area_comum_{id_a}", help="Excluir essa área comum"):
@@ -53,3 +53,6 @@ if areas_comuns:
                     if st.button(":material/edit_square:", key=f"edit_area_comum_{id_a}", help="Editar essa área comum"):
                         st.session_state.editing_area_comum = id_a
                         st.switch_page("pages/edicaoAreaComum.py")
+
+else:
+    st.info("Nenhuma área comum cadastrada neste condomínio.")

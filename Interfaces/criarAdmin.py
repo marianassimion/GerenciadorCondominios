@@ -8,8 +8,8 @@ conexao = mysql.connector.connect(
 )
 cursor = conexao.cursor()
 
-email = "rute@condo.com"
-nome = "Rute"
+email = "mariana@condo.com"
+nome = "Mariana"
 senha_texto = "123" 
 
 # Gera o Hash
