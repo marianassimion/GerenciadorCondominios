@@ -82,8 +82,6 @@ CREATE TABLE EMPREGADO (
         FOREIGN KEY (condominio_cnpj) REFERENCES CONDOMINIO(cnpj)
 );
 
-ALTER TABLE empregados ADD COLUMN foto LONGBLOB;
-
 CREATE TABLE VEICULO (
     placa VARCHAR(10) PRIMARY KEY,
     modelo VARCHAR(40) NOT NULL,
@@ -109,6 +107,7 @@ CREATE TABLE TAXA (
 CREATE TABLE MULTA (
     id_multa INTEGER AUTO_INCREMENT PRIMARY KEY,
     data_emissao date NOT NULL,
+    data_vencimento date NOT NULL,
     status_pagamento varchar(10) DEFAULT 'Pendente',
     valor DECIMAL(10, 2),
     descricao VARCHAR(220),
