@@ -1,13 +1,16 @@
-import mysql.connector
 import streamlit as st
+import mysql.connector
 import bcrypt
 import time
 from pages.config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME 
-import time
 
-# Conexão com o banco de dados
+# ==============================================================================
+# CONFIGURAÇÃO E CONEXÃO COM BANCO DE DADOS
+# ==============================================================================
+
 @st.cache_resource
 def get_db_connection():
+    """Estabelece a conexão com o banco de dados MySQL."""
     try:
         return mysql.connector.connect(
             host=DB_HOST, user=DB_USER, password=DB_PASSWORD, database=DB_NAME
@@ -16,21 +19,33 @@ def get_db_connection():
         st.error(f"Erro ao conectar no MySQL: {err}")
         st.stop()
 
+# Inicializa a conexão global (cuidado ao usar globalmente em apps multi-thread)
 conexao = get_db_connection()
 
-# Login
+
+# ==============================================================================
+# AUTENTICAÇÃO E SESSÃO
+# ==============================================================================
+
 def verificar_login(email, senha_digitada):
+    """Verifica as credenciais do administrador no banco."""
     cursor = conexao.cursor(buffered=True)
     try:
         comando = "SELECT id_administrador, nome, email, senha FROM ADMINISTRADOR WHERE email = %s"
         cursor.execute(comando, (email,))
         usuario = cursor.fetchone()
+        
         if usuario:
             id_admin, nome, email_db, senha_hash_banco = usuario
+            
+            # Garante que o hash esteja em bytes
             if isinstance(senha_hash_banco, str):
                 senha_hash_banco = senha_hash_banco.encode('utf-8')
+            
+            # Compara a senha digitada com o hash
             if bcrypt.checkpw(senha_digitada.encode('utf-8'), senha_hash_banco):
                 return (id_admin, nome, email_db)
+        
         return None 
 
     except mysql.connector.Error as err:
@@ -40,13 +55,33 @@ def verificar_login(email, senha_digitada):
         cursor.close()
 
 def login_sessao():
+    """Gerencia o estado da sessão e redirecionamento."""
     if not st.session_state.get('logged_in'):
         st.error("Acesso negado. Por favor, faça login.")
         time.sleep(3) 
         st.switch_page("login.py")
         st.stop() 
 
-# Condomínio
+
+# ==============================================================================
+# ENTIDADE: CONDOMÍNIO
+# ==============================================================================
+
+# --- [CREATE] ---
+def criar_condominio(nome, id_admin, cnpj, logradouro, bairro, cidade, uf, cep):
+    cursor = conexao.cursor(buffered=True)
+    try:
+        cmd = "INSERT INTO condominio (nome, id_admin, cnpj, logradouro, bairro, cidade, uf, cep) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(cmd, (nome, id_admin, cnpj, logradouro, bairro, cidade, uf, cep))
+        conexao.commit()
+        return True
+    except mysql.connector.Error:
+        conexao.rollback()
+        return False
+    finally:
+        cursor.close()
+
+# --- [READ] ---
 def listar_condominios():
     cursor = conexao.cursor(buffered=True) 
     try:
@@ -68,19 +103,7 @@ def obter_condominio_por_cnpj(cnpj):
     finally:
         cursor.close()
 
-def criar_condominio(nome,id_admin, cnpj, logradouro, bairro, cidade, uf, cep):
-    cursor = conexao.cursor(buffered=True)
-    try:
-        cmd = "INSERT INTO condominio (nome, id_admin, cnpj, logradouro, bairro, cidade, uf, cep) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-        cursor.execute(cmd, (nome, id_admin, cnpj, logradouro, bairro, cidade, uf, cep))
-        conexao.commit()
-        return True
-    except mysql.connector.Error:
-        conexao.rollback()
-        return False
-    finally:
-        cursor.close()
-
+# --- [UPDATE] ---
 def atualizar_condominio(cnpj_original, nome, logradouro, bairro, cidade, uf, cep):
     cursor = conexao.cursor(buffered=True)
     try:
@@ -94,9 +117,11 @@ def atualizar_condominio(cnpj_original, nome, logradouro, bairro, cidade, uf, ce
     finally:
         cursor.close()
 
+# --- [DELETE] ---
 def deletar_condominio(cnpj):
     cursor = conexao.cursor(buffered=True)
     try:
+        # Excluir dependências em cascata manualmente
         cursor.execute("SELECT id_residencia FROM RESIDENCIA WHERE condominio_cnpj = %s", (cnpj,))
         residencias = cursor.fetchall()
 
@@ -116,7 +141,6 @@ def deletar_condominio(cnpj):
             cursor.execute("DELETE FROM RESIDENCIA WHERE id_residencia = %s", (id_res,))
 
         cursor.execute("DELETE FROM EMPREGADO WHERE condominio_cnpj = %s", (cnpj,))
-
         cursor.execute("DELETE FROM CONDOMINIO WHERE cnpj = %s", (cnpj,))
 
         conexao.commit()
@@ -125,9 +149,8 @@ def deletar_condominio(cnpj):
     except mysql.connector.Error as err:
         if err.errno == 1451:
             st.error(
-                "Não é possível excluir este condomínio, pois ele possui dependências associadas "
-                "(empregados, moradores, residências, multas, taxas, veículos ou visitantes). "
-                "Remova essas informações antes de excluir."
+                "Não é possível excluir este condomínio pois possui dependências associadas. "
+                "Limpe os dados associados antes de excluir."
             )
         else:
             st.error(f"Erro ao deletar condomínio: {err}")
@@ -138,7 +161,12 @@ def deletar_condominio(cnpj):
     finally:
         cursor.close()
 
-# Empregado
+
+# ==============================================================================
+# ENTIDADE: EMPREGADO
+# ==============================================================================
+
+# --- [CREATE] ---
 def criar_empregado(cpf, nome, cargo, matricula, data_admissao, salario, cnpj_atual, foto_bytes):
     cursor = conexao.cursor(buffered=True)
     query = """
@@ -146,37 +174,27 @@ def criar_empregado(cpf, nome, cargo, matricula, data_admissao, salario, cnpj_at
         (cpf, nome, cargo, matricula, data_admissao, salario, condominio_cnpj, foto)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
     """
-
-    cursor.execute(query, (cpf, nome, cargo, matricula, data_admissao, salario, cnpj_atual, foto_bytes))
-    conexao.commit()
-    return True
-
-def deletar_empregado(cpf):
-    cursor = conexao.cursor(buffered=True)
     try:
-        cursor.execute("DELETE FROM EMPREGADO WHERE cpf = %s", (cpf,))
+        cursor.execute(query, (cpf, nome, cargo, matricula, data_admissao, salario, cnpj_atual, foto_bytes))
         conexao.commit()
         return True
     except mysql.connector.Error as err:
-        st.error(f"Erro ao deletar empregado: {err}")
+        st.error(f"Erro ao criar empregado: {err}")
         conexao.rollback()
         return False
     finally:
         cursor.close()
 
+# --- [READ] ---
 def obter_empregados(condominio_cnpj):
     cursor = conexao.cursor(buffered=True)
     comando = "SELECT nome, cargo, matricula, data_admissao, salario, cpf, foto FROM EMPREGADO WHERE condominio_cnpj = %s"
-
     try:
         cursor.execute(comando, (condominio_cnpj,))
-        resultados = cursor.fetchall()
-        return resultados
-    
+        return cursor.fetchall()
     except mysql.connector.Error as err:
         st.error(f"Erro ao buscar empregados: {err}")
         return None
-    
     finally:
         cursor.close()
 
@@ -191,15 +209,17 @@ def obter_empregado_por_cpf(cpf):
     finally:
         cursor.close()
 
-def atualizar_empregado(nome, cargo, matricula, data_admissao, salario, foto, cpf_original ):
+# --- [UPDATE] ---
+def atualizar_empregado(nome, cargo, matricula, data_admissao, salario, foto, cpf_original):
     cursor = conexao.cursor(buffered=True)
     try:
         if foto is None:
             cursor.execute("SELECT foto FROM EMPREGADO WHERE cpf=%s", (cpf_original,))
             foto_atual = cursor.fetchone()[0]
             foto = foto_atual
+        
         cmd = "UPDATE EMPREGADO SET nome=%s, cargo=%s, matricula=%s, data_admissao=%s, salario=%s, foto=%s WHERE cpf=%s"
-        cursor.execute(cmd, (nome, cargo, matricula, data_admissao, salario, foto, cpf_original ))
+        cursor.execute(cmd, (nome, cargo, matricula, data_admissao, salario, foto, cpf_original))
         conexao.commit()
         return True
     
@@ -211,17 +231,35 @@ def atualizar_empregado(nome, cargo, matricula, data_admissao, salario, foto, cp
     finally:
         cursor.close()
 
-# Avisos 
+# --- [DELETE] ---
+def deletar_empregado(cpf):
+    cursor = conexao.cursor(buffered=True)
+    try:
+        cursor.execute("DELETE FROM EMPREGADO WHERE cpf = %s", (cpf,))
+        conexao.commit()
+        return True
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao deletar empregado: {err}")
+        conexao.rollback()
+        return False
+    finally:
+        cursor.close()
+
+
+# ==============================================================================
+# ENTIDADE: AVISOS
+# ==============================================================================
+
+# --- [CREATE] ---
 def criar_aviso(titulo, texto, id_administrador, condominio_cnpj):
     cursor = conexao.cursor(buffered=True)
     try:
-        comando = f'INSERT INTO AVISO(titulo, texto, id_administrador) VALUES (%s, %s, %s)'
+        comando = 'INSERT INTO AVISO(titulo, texto, id_administrador) VALUES (%s, %s, %s)'
         valores = (titulo, texto, id_administrador)
         cursor.execute(comando, valores)
         conexao.commit()
         print(f"Aviso '{titulo}' criado com sucesso!")
         return True
-        
     except mysql.connector.Error as err:
         print(f"Erro ao criar aviso: {err}")
         conexao.rollback()
@@ -229,6 +267,29 @@ def criar_aviso(titulo, texto, id_administrador, condominio_cnpj):
     finally:
         cursor.close()
 
+# --- [READ] ---
+def listar_avisos():
+    # Nota: Aqui cria-se uma nova conexão/cursor, independente da global
+    local_conexao = get_db_connection()
+    cursor = local_conexao.cursor()
+    comando = """
+        SELECT aviso.id_aviso, aviso.titulo, aviso.texto, aviso.data_aviso, admin.nome, aviso.condominio_cnpj 
+        FROM AVISO AS aviso 
+        JOIN ADMINISTRADOR AS admin ON aviso.id_administrador = admin.id_administrador 
+        ORDER BY aviso.data_aviso DESC
+    """
+    try:
+        cursor.execute(comando)
+        return cursor.fetchall()
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao listar avisos: {err}")
+        return []
+    finally:
+        cursor.close()
+        # É boa prática fechar a conexão local se não for reutilizada, 
+        # mas como é get_db_connection com cache, o streamlit gerencia.
+
+# --- [DELETE] ---
 def deletar_aviso(id_aviso):
     cursor = conexao.cursor(buffered=True)
     try:
@@ -242,21 +303,26 @@ def deletar_aviso(id_aviso):
     finally:
         cursor.close()
 
-def listar_avisos():
-    conexao = get_db_connection()
+
+# ==============================================================================
+# ENTIDADE: RESIDÊNCIA
+# ==============================================================================
+
+# --- [CREATE] ---
+def criar_residencia(num_unidade, bloco, tipo, condominio_cnpj):
     cursor = conexao.cursor()
-    comando = """SELECT aviso.id_aviso, aviso.titulo, aviso.texto, aviso.data_aviso, admin.nome, aviso.condominio_cnpj   FROM AVISO AS aviso JOIN ADMINISTRADOR AS admin ON aviso.id_administrador = admin.id_administrador ORDER BY aviso.data_aviso DESC"""
-    
     try:
-        cursor.execute(comando)
-        return cursor.fetchall()
+        cmd = "INSERT INTO RESIDENCIA (num_unidade, bloco, tipo, condominio_cnpj) VALUES (%s, %s, %s, %s)"
+        cursor.execute(cmd, (num_unidade, bloco, tipo, condominio_cnpj))
+        conexao.commit()
+        return True
     except mysql.connector.Error as err:
-        st.error(f"Erro ao listar avisos: {err}")
-        return []
+        st.error(f"Erro ao criar residência: {err}")
+        return False
     finally:
         cursor.close()
 
-# Residência
+# --- [READ] ---
 def listar_residencias(cnpj_condominio):
     cursor = conexao.cursor(buffered=True) 
     try:
@@ -266,14 +332,11 @@ def listar_residencias(cnpj_condominio):
             WHERE condominio_cnpj = %s
             ORDER BY bloco, num_unidade
         """
-    
         cursor.execute(sql, (cnpj_condominio,))
         return cursor.fetchall()
-    
     except mysql.connector.Error as err:
         st.error(f"Erro ao buscar residências: {err}")
         return []
-        
     finally:
         cursor.close()
 
@@ -304,36 +367,22 @@ def buscar_residencias(cnpj_condominio, unidade=""):
     except mysql.connector.Error as err:
         st.error(f"Erro ao buscar residências: {err}")
         return []
-        
     finally:
         cursor.close()
-        conexao.close()
 
 def obter_residencia_por_id(id_residencia):
     cursor = conexao.cursor(buffered=True)
     try:
-        cursor.execute("SELECT num_unidade, bloco, tipo, condominio_cnpj FROM CONDOMINIO WHERE id_residencia = %s", (id_residencia,))
+        # Nota: Corrigi a tabela de CONDOMINIO para RESIDENCIA, pois parecia um erro lógico
+        cursor.execute("SELECT num_unidade, bloco, tipo, condominio_cnpj FROM RESIDENCIA WHERE id_residencia = %s", (id_residencia,))
         return cursor.fetchone()
     except mysql.connector.Error:
         return None
     finally:
         cursor.close()
 
-def criar_residencia(num_unidade, bloco, tipo, condominio_cnpj):
-    cursor = conexao.cursor()
-    try:
-        cmd = "INSERT INTO RESIDENCIA (num_unidade, bloco, tipo, condominio_cnpj) VALUES (%s, %s, %s, %s)"
-        cursor.execute(cmd, (num_unidade, bloco, tipo, condominio_cnpj))
-        conexao.commit()
-        return True
-    except mysql.connector.Error as err:
-        st.error(f"Erro ao criar: {err}")
-        return False
-    finally:
-        cursor.close()
-
+# --- [UPDATE] ---
 def editar_residencia(id_residencia, num_unidade, bloco, tipo):
-    conexao = get_db_connection()
     cursor = conexao.cursor()
     try:
         cmd = """
@@ -345,13 +394,13 @@ def editar_residencia(id_residencia, num_unidade, bloco, tipo):
         conexao.commit()
         return True
     except mysql.connector.Error as err:
-        st.error(f"Erro ao atualizar: {err}")
+        st.error(f"Erro ao atualizar residência: {err}")
         return False
     finally:
         cursor.close()
 
+# --- [DELETE] ---
 def deletar_residencia(id_residencia):
-    conexao = get_db_connection()
     cursor = conexao.cursor()
     try:
         cursor.execute("DELETE FROM MULTA WHERE id_residencia = %s", (id_residencia,))
@@ -363,12 +412,17 @@ def deletar_residencia(id_residencia):
         return True
     except Exception as e:
         conexao.rollback() 
-        st.error(f"Erro ao deletar: {e}")
+        st.error(f"Erro ao deletar residência: {e}")
         return False
     finally:
         cursor.close()
 
-# Morador
+
+# ==============================================================================
+# ENTIDADE: MORADOR
+# ==============================================================================
+
+# --- [DELETE] ---
 def deletar_morador(cpf):
     cursor = conexao.cursor(buffered=True)
     try:
