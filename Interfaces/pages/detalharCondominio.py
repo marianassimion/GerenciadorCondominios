@@ -32,19 +32,19 @@ if dados_condominio:
 
     # --- SEÇÃO DE AVISOS ---
     col_tit, col_btn = st.columns([3, 1], vertical_alignment="bottom")
+
     if col_btn.button("Quadro de avisos", use_container_width=True):
         st.switch_page("pages/listagemAvisos.py")
 
+    if col_btn.button("Novo Empregado", use_container_width=True):
+        st.switch_page("pages/cadastroEmpregado.py")
     # --- SEÇÃO DE EMPREGADOS ---
     col_tit, col_btn = st.columns([3, 1], vertical_alignment="bottom")
     col_tit.subheader("Quadro de Funcionários")
     
-    if col_btn.button("Novo Empregado", use_container_width=True):
-        st.switch_page("pages/cadastroEmpregado.py")
 
-    
     # Cabeçalho da Tabela
-    c1, c2, c3, c4, c5, c6, c_edit, c_del = st.columns([2.5, 2, 1.2, 1, 1, 1, 0.8, 0.8], vertical_alignment="center")
+    c1, c2, c3, c4, c5, c6, c_edit, c_del = st.columns([2, 1.5, 1.2, 1.5, 1, 1, 0.8, 0.8], vertical_alignment="center")
     c1.markdown("**Nome**")
     c2.markdown("**Cargo**")
     c3.markdown("**Matrícula**")
@@ -58,7 +58,7 @@ if dados_condominio:
             for emp in empregados:
                 nome_e, cargo_e, mat_e, data_e, sal_e, cpf_e, foto_e = emp
 
-                c1, c2, c3, c4, c5, c6, c_edit, c_del = st.columns([2.5, 2, 1.2, 1, 1, 1, 0.8, 0.8], vertical_alignment="center")
+                c1, c2, c3, c4, c5, c6, c_edit, c_del = st.columns([2, 1.5, 1.2, 1.5, 1, 1, 0.8, 0.8], vertical_alignment="center")
                 c1.write(nome_e)
                 c2.write(cargo_e)
                 c3.write(str(mat_e))
