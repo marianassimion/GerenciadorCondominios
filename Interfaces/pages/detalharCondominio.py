@@ -42,6 +42,7 @@ if dados_condominio:
     if col_btn.button("Novo Empregado", use_container_width=True):
         st.switch_page("pages/cadastroEmpregado.py")
 
+    
     # Cabeçalho da Tabela
     c1, c2, c3, c4, c5, c6, c_edit, c_del = st.columns([2.5, 2, 1.2, 1, 1, 1, 0.8, 0.8], vertical_alignment="center")
     c1.markdown("**Nome**")

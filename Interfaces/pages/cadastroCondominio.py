@@ -1,16 +1,16 @@
 import streamlit as st
-from db_functions import get_db_connection, criar_condominio
+from db_functions import criar_condominio, login_sessao
 import time
 
-conexao = get_db_connection()
-cursor = conexao.cursor()
-
 st.set_page_config(page_title="Novo Condomínio")
+
+id_admin = st.session_state.usuario[0]
+login_sessao()
 
 st.title("Novo Condomínio")
 st.markdown("Preencha os dados abaixo para registrar um novo condomínio.")
 
-# Forms
+# FORMULÁRIO
 with st.form("form_cadastro_condominio", height=600):
     st.subheader("Dados do Condomínio")
     nome = st.text_input("Nome do Condomínio*", placeholder="Ex: Residencial Flores")
@@ -26,22 +26,21 @@ with st.form("form_cadastro_condominio", height=600):
     uf = c4.text_input("UF*", placeholder="Ex: GO, DF", max_chars=2)
     cep = c5.text_input("CEP*", placeholder="Apenas números",  max_chars=8)
 
-    submitted = st.form_submit_button("Salvar Cadastro", type="primary", use_container_width=True)
+    enviado = st.form_submit_button("Salvar Cadastro", type="primary", use_container_width=True)
     cancelar = st.form_submit_button("Cancelar", use_container_width=True)
 
 if cancelar:
     st.switch_page("pages/home.py")
 
-# Salvando os dados
-if submitted:
+# SALVANDO CONDOMÍNIO
+if enviado:
     if not nome or not cnpj:
         st.warning("Os campos **Nome** e **CNPJ** são obrigatórios.")
     if not cep or not cidade or not uf or not logradouro or not bairro:
         print("Os campos de endereço são obrigatórios!")
     else:
-        cadastrar_condominio = criar_condominio(nome, cnpj, logradouro, bairro, cidade, uf, cep)
-        
+        cadastrar_condominio = criar_condominio(nome, id_admin, cnpj, logradouro, bairro, cidade, uf, cep)
         if cadastrar_condominio:
             st.success(f"Condomínio **{nome}** cadastrado com sucesso")
-            time.sleep(1.5) 
+            time.sleep(1) 
             st.switch_page("pages/home.py") 

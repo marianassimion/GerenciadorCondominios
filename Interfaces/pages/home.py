@@ -8,8 +8,8 @@ cursor = conexao.cursor()
 login_sessao()
 
 # Dados da sessão
-admin_name = st.session_state.usuario[0]
-admin_email = st.session_state.usuario[1] 
+admin_name = st.session_state.usuario[1]
+admin_email = st.session_state.usuario[2] 
 
 # CONDOMÍNIOS
 with st.container(border=True):
@@ -31,7 +31,7 @@ with st.container(height=400, border=True):
         cnpj_c, nome_c = cond[0], cond[1]
             
         with st.container(border=True):
-            c_icon, c_nome, c_ver, c_edit, c_del = st.columns([0.5, 4, 0.5, 0.5, 0.5], vertical_alignment="center")
+            c_icon, c_nome, c_ver, c_res, c_mor, c_edit, c_del = st.columns([0.5, 4, 0.7, 0.7,  0.7, 0.7, 0.7], vertical_alignment="center")
             c_icon.image("./img/apt2.png", width=70)
             c_nome.write(f"**{nome_c}**")
                 
@@ -39,7 +39,17 @@ with st.container(height=400, border=True):
                 st.session_state['detail_cnpj'] = cnpj_c                
                 st.switch_page("pages/detalharCondominio.py")
                 st.rerun()
-                
+            
+            if c_res.button(":material/home_work:", key=f"res_{cnpj_c}", help="Residências"):
+                st.session_state['detail_cnpj'] = cnpj_c                
+                st.switch_page("pages/residencias.py")
+                st.rerun()
+
+            if c_mor.button(":material/perm_identity:", key=f"mor_{cnpj_c}", help="Moradores"):
+                st.session_state['detail_cnpj'] = cnpj_c                
+                st.switch_page("pages/morador.py")
+                st.rerun()
+
             if c_edit.button(":material/edit_square:", key=f"edit_{cnpj_c}", help="Editar condomínio"):
                 st.session_state['cnpj_edicao'] = cnpj_c                
                 st.switch_page("pages/edicaoCondominio.py")
