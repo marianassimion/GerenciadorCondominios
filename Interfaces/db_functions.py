@@ -438,3 +438,80 @@ def deletar_morador(cpf):
         return False
     finally:
         cursor.close()
+
+
+# ==============================================================================
+# ENTIDADE: ÁREA COMUM
+# ==============================================================================
+
+# --- [CREATE] ---
+def criar_area_comum(nome, descricao, capacidade, condominio_cnpj):
+    cursor = conexao.cursor()
+    try:
+        cmd = "INSERT INTO AREA_COMUM (nome, descricao, capacidade, condominio_cnpj) VALUES (%s, %s, %s, %s)"
+        cursor.execute(cmd, (nome, descricao, capacidade, condominio_cnpj))
+        conexao.commit()
+        return True
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao criar área comum: {err}")
+        return False
+    finally:
+        cursor.close()
+
+# --- [READ] ---
+def obter_area_comum(condominio_cnpj):
+    cursor = conexao.cursor(buffered=True)
+    comando = "SELECT id_area_comum, nome, descricao, capacidade FROM AREA_COMUM WHERE condominio_cnpj = %s"
+    try:
+        cursor.execute(comando, (condominio_cnpj,))
+        return cursor.fetchall()
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao buscar áreas comuns: {err}")
+        return None
+    finally:
+        cursor.close()
+
+def listar_areas_comuns():
+    local_conexao = get_db_connection()
+    cursor = local_conexao.cursor()
+    comando = """SELECT id_area_comum, nome, descricao, capacidade, condominio_cnpj FROM AREA_COMUM """
+    try:
+        cursor.execute(comando)
+        return cursor.fetchall()
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao listar áreas comuns: {err}")
+        return []
+    finally:
+        cursor.close()
+
+# --- [UPDATE] ---
+def atualizar_area_comum(id_areacomum, nome, descricao, capacidade, condomimio_cnpj):
+    cursor = conexao.cursor(buffered=True)
+    try:
+        
+        cmd = "UPDATE AREA_COMUM SET nome=%s, descricao=%s, capacidade=%s WHERE id_areacomum=%s"
+        cursor.execute(cmd, (nome, descricao, capacidade, id_areacomum))
+        conexao.commit()
+        return True
+    
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao atualizar área comum: {err}")
+        conexao.rollback()
+        return False
+    
+    finally:
+        cursor.close()
+
+# --- [DELETE] ---
+def deletar_area_comum(condominio_cnpj):
+    cursor = conexao.cursor(buffered=True)
+    try:
+        cursor.execute("DELETE FROM AREACOMUM WHERE id_areacomum=%s", (condominio_cnpj,))
+        conexao.commit()
+        return True
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao deletar área comum: {err}")
+        conexao.rollback()
+        return False
+    finally:
+        cursor.close()
