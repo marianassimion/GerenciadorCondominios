@@ -97,29 +97,59 @@ def atualizar_condominio(cnpj_original, nome, logradouro, bairro, cidade, uf, ce
 def deletar_condominio(cnpj):
     cursor = conexao.cursor(buffered=True)
     try:
+        cursor.execute("SELECT id_residencia FROM RESIDENCIA WHERE condominio_cnpj = %s", (cnpj,))
+        residencias = cursor.fetchall()
+
+        for (id_res,) in residencias:
+            cursor.execute("DELETE FROM MULTA WHERE id_residencia = %s", (id_res,))
+            cursor.execute("DELETE FROM TAXA WHERE id_residencia = %s", (id_res,))
+            cursor.execute("DELETE FROM VISITANTE WHERE id_residencia = %s", (id_res,))
+
+            cursor.execute("SELECT cpf FROM MORADOR WHERE id_residencia = %s", (id_res,))
+            moradores = cursor.fetchall()
+
+            for (cpf_morador,) in moradores:
+                cursor.execute("DELETE FROM VEICULO WHERE morador_cpf = %s", (cpf_morador,))
+                cursor.execute("DELETE FROM TELEFONE_MORADOR WHERE cpf = %s", (cpf_morador,))
+
+            cursor.execute("DELETE FROM MORADOR WHERE id_residencia = %s", (id_res,))
+            cursor.execute("DELETE FROM RESIDENCIA WHERE id_residencia = %s", (id_res,))
+
+        cursor.execute("DELETE FROM EMPREGADO WHERE condominio_cnpj = %s", (cnpj,))
+
         cursor.execute("DELETE FROM CONDOMINIO WHERE cnpj = %s", (cnpj,))
+
         conexao.commit()
         return True
-    except mysql.connector.Error:
+
+    except mysql.connector.Error as err:
+        if err.errno == 1451:
+            st.error(
+                "Não é possível excluir este condomínio, pois ele possui dependências associadas "
+                "(empregados, moradores, residências, multas, taxas, veículos ou visitantes). "
+                "Remova essas informações antes de excluir."
+            )
+        else:
+            st.error(f"Erro ao deletar condomínio: {err}")
+        
         conexao.rollback()
         return False
+
     finally:
         cursor.close()
 
 # Empregado
-def criar_empregado(cpf, nome, cargo, matricula, data_admissao, salario, condominio_cnpj):
+def criar_empregado(cpf, nome, cargo, matricula, data_admissao, salario, cnpj_atual, foto_bytes):
     cursor = conexao.cursor(buffered=True)
-    try:
-        cmd = "INSERT INTO EMPREGADO (cpf, nome, cargo, matricula, data_admissao, salario, condominio_cnpj) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-        cursor.execute(cmd, (cpf, nome, cargo, matricula, data_admissao, salario, condominio_cnpj))
-        conexao.commit()
-        return True
-    except mysql.connector.Error as err:
-        st.error(f"Erro: {err}")
-        conexao.rollback()
-        return False
-    finally:
-        cursor.close()
+    query = """
+        INSERT INTO EMPREGADO
+        (cpf, nome, cargo, matricula, data_admissao, salario, condominio_cnpj, foto)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    """
+
+    cursor.execute(query, (cpf, nome, cargo, matricula, data_admissao, salario, cnpj_atual, foto_bytes))
+    conexao.commit()
+    return True
 
 def deletar_empregado(cpf):
     cursor = conexao.cursor(buffered=True)
@@ -136,7 +166,7 @@ def deletar_empregado(cpf):
 
 def obter_empregados(condominio_cnpj):
     cursor = conexao.cursor(buffered=True)
-    comando = "SELECT nome, cargo, matricula, data_admissao, salario, cpf FROM EMPREGADO WHERE condominio_cnpj = %s"
+    comando = "SELECT nome, cargo, matricula, data_admissao, salario, cpf, foto FROM EMPREGADO WHERE condominio_cnpj = %s"
 
     try:
         cursor.execute(comando, (condominio_cnpj,))
@@ -153,7 +183,7 @@ def obter_empregados(condominio_cnpj):
 def obter_empregado_por_cpf(cpf):
     cursor = conexao.cursor(buffered=True)
     try:
-        cursor.execute("SELECT nome, cargo, matricula, data_admissao, salario, cpf FROM EMPREGADO WHERE cpf = %s", (cpf,))
+        cursor.execute("SELECT nome, cargo, matricula, data_admissao, salario, cpf, foto FROM EMPREGADO WHERE cpf = %s", (cpf,))
         return cursor.fetchone()
     except mysql.connector.Error as err:
         st.error(f"Erro ao buscar empregado: {err}")
@@ -161,17 +191,23 @@ def obter_empregado_por_cpf(cpf):
     finally:
         cursor.close()
 
-def atualizar_empregado(cpf_original, nome, cargo, matricula, data_admissao, salario):
+def atualizar_empregado(nome, cargo, matricula, data_admissao, salario, foto, cpf_original ):
     cursor = conexao.cursor(buffered=True)
     try:
-        cmd = "UPDATE EMPREGADO SET nome=%s, cargo=%s, matricula=%s, data_admissao=%s, salario=%s WHERE cpf=%s"
-        cursor.execute(cmd, (nome, cargo, matricula, data_admissao, salario, cpf_original))
+        if foto is None:
+            cursor.execute("SELECT foto FROM EMPREGADO WHERE cpf=%s", (cpf_original,))
+            foto_atual = cursor.fetchone()[0]
+            foto = foto_atual
+        cmd = "UPDATE EMPREGADO SET nome=%s, cargo=%s, matricula=%s, data_admissao=%s, salario=%s, foto=%s WHERE cpf=%s"
+        cursor.execute(cmd, (nome, cargo, matricula, data_admissao, salario, foto, cpf_original ))
         conexao.commit()
         return True
+    
     except mysql.connector.Error as err:
         st.error(f"Erro ao atualizar empregado: {err}")
         conexao.rollback()
         return False
+    
     finally:
         cursor.close()
 
