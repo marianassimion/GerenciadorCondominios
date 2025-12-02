@@ -35,13 +35,11 @@ if areas_comuns:
             
             # --- O CARD DE ÁREA---
             with st.container(border=True):
-                c_content, c_edit, c_del = st.columns = st.columns([0.8, 0.1, 0.1])
+                c_content, c_edit, c_del = st.columns([0.8, 0.1, 0.1])
                 
                 with c_content:
                     st.markdown(f"**{nome_a}** <span style='color:grey; font-size:0.8em;'> • </span>", unsafe_allow_html=True)
-                    
                     st.markdown(f"#### {desc_a}")
-                    
                     st.write(cap_a)
 
                 with c_del:
@@ -50,9 +48,8 @@ if areas_comuns:
                             st.toast("Área comum excluída!")
                             time.sleep(1)
                             st.rerun()
+
                 with c_edit:
                     if st.button(":material/edit_square:", key=f"edit_area_comum_{id_a}", help="Editar essa área comum"):
-                        #if atualizar_area_comum(id_a):
-                            st.toast("Área comum excluída!")
-                            time.sleep(1)
-                            st.rerun()
+                        st.session_state.area_comum_editando = id_a
+                        st.switch_page("pages/edicaoAreaComum.py")

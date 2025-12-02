@@ -9,7 +9,7 @@ id_administrador = st.session_state.usuario[0]
 
 if 'detail_cnpj' not in st.session_state or st.session_state.detail_cnpj is None:
     st.warning("Nenhum condomínio selecionado.")
-    st.button("Voltar para Home", on_click=lambda: st.switch_page("home.py"))
+    st.button("Voltar para Home", on_click=lambda: st.switch_page("pages/home.py"))
     st.stop()
 
 cnpj_atual = st.session_state.detail_cnpj
