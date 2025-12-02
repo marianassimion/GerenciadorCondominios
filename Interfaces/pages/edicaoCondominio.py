@@ -9,7 +9,7 @@ def voltar_home():
     # Limpa a variável de edição para não dar conflito na próxima vez
     if 'cnpj_edicao' in st.session_state:
         del st.session_state['cnpj_edicao']
-    st.switch_page("home.py") # Verifique se o nome do arquivo é exatamente este (maiúsculas/minúsculas importam)
+    st.switch_page("pages/home.py") # Verifique se o nome do arquivo é exatamente este (maiúsculas/minúsculas importam)
 
 # --- VERIFICAÇÃO DE SEGURANÇA ---
 if 'cnpj_edicao' not in st.session_state or st.session_state.cnpj_edicao is None:
@@ -62,14 +62,12 @@ if dados:
             st.warning("O nome não pode ficar vazio.")
         else:
             try:
-                sucesso = atualizar_condominio(
-                    cnpj_atual, novo_nome, novo_log, novo_bairro, nova_cid, nova_uf, novo_cep
-                )
+                sucesso = atualizar_condominio(cnpj_atual, novo_nome, novo_log, novo_bairro, nova_cid, nova_uf, novo_cep)
                 
                 if sucesso:
                     st.success("Condomínio atualizado com sucesso! Redirecionando...")
-                    time.sleep(1.5) # Dá tempo do usuário ler a mensagem
-                    voltar_home()   # Chama a função que limpa o estado e navega
+                    time.sleep(1.5) 
+                    voltar_home()   
                 else:
                     st.error("Erro ao atualizar no banco de dados. Tente novamente.")
             
