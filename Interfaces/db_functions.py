@@ -30,7 +30,7 @@ def verificar_login(email, senha_digitada):
             if isinstance(senha_hash_banco, str):
                 senha_hash_banco = senha_hash_banco.encode('utf-8')
             if bcrypt.checkpw(senha_digitada.encode('utf-8'), senha_hash_banco):
-                return (nome, email_db)
+                return (id_admin, nome, email_db)
         return None 
 
     except mysql.connector.Error as err:
@@ -68,11 +68,11 @@ def obter_condominio_por_cnpj(cnpj):
     finally:
         cursor.close()
 
-def criar_condominio(nome, cnpj, logradouro, bairro, cidade, uf, cep):
+def criar_condominio(nome,id_admin, cnpj, logradouro, bairro, cidade, uf, cep):
     cursor = conexao.cursor(buffered=True)
     try:
-        cmd = "INSERT INTO condominio (nome, cnpj, logradouro, bairro, cidade, uf, cep) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-        cursor.execute(cmd, (nome, cnpj, logradouro, bairro, cidade, uf, cep))
+        cmd = "INSERT INTO condominio (nome, id_admin, cnpj, logradouro, bairro, cidade, uf, cep) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(cmd, (nome, id_admin, cnpj, logradouro, bairro, cidade, uf, cep))
         conexao.commit()
         return True
     except mysql.connector.Error:
@@ -175,6 +175,7 @@ def atualizar_empregado(cpf_original, nome, cargo, matricula, data_admissao, sal
     finally:
         cursor.close()
 
+# Avisos 
 def criar_aviso(titulo, texto, id_administrador, condominio_cnpj):
     cursor = conexao.cursor(buffered=True)
     try:
@@ -205,7 +206,6 @@ def deletar_aviso(id_aviso):
     finally:
         cursor.close()
 
-
 def listar_avisos():
     conexao = get_db_connection()
     cursor = conexao.cursor()
@@ -219,24 +219,6 @@ def listar_avisos():
         return []
     finally:
         cursor.close()
-
-
-
-# =========================================================================
-# FUNÇÃO DE LOGIN 
-# =========================================================================
-
-# def verificar_login(email, senha_digitada):
-#     cursor = conexao.cursor(buffered=True)
-#     comando = "SELECT nome, cargo, matricula, data_admissao, salario, cpf FROM EMPREGADO WHERE condominio_cnpj = %s"
-#     try:
-#         cursor.execute(comando, (cnpj_condominio,))
-#         return cursor.fetchall()
-#     except mysql.connector.Error as err:
-#         st.error(f"Erro ao buscar empregados: {err}")
-#         return []
-#     finally:
-#         cursor.close()
 
 # Residência
 def listar_residencias(cnpj_condominio):
@@ -260,7 +242,6 @@ def listar_residencias(cnpj_condominio):
         cursor.close()
 
 def buscar_residencias(cnpj_condominio, unidade=""):
-    conexao = get_db_connection()
     cursor = conexao.cursor(dictionary=True) 
     try:
         if unidade:
@@ -291,6 +272,16 @@ def buscar_residencias(cnpj_condominio, unidade=""):
     finally:
         cursor.close()
         conexao.close()
+
+def obter_residencia_por_id(id_residencia):
+    cursor = conexao.cursor(buffered=True)
+    try:
+        cursor.execute("SELECT num_unidade, bloco, tipo, condominio_cnpj FROM CONDOMINIO WHERE id_residencia = %s", (id_residencia,))
+        return cursor.fetchone()
+    except mysql.connector.Error:
+        return None
+    finally:
+        cursor.close()
 
 def criar_residencia(num_unidade, bloco, tipo, condominio_cnpj):
     cursor = conexao.cursor()
@@ -337,6 +328,69 @@ def deletar_residencia(id_residencia):
     except Exception as e:
         conexao.rollback() 
         st.error(f"Erro ao deletar: {e}")
+        return False
+    finally:
+        cursor.close()
+
+# Morador
+def listar_moradores_por_residencia(id_residencia):
+    # Usa a conexão global criada no início do arquivo
+    cursor = conexao.cursor(buffered=True) 
+    try:
+        # Adicionado foto_perfil na consulta
+        sql = """
+            SELECT cpf, nome, Email, sindico, foto_perfil 
+            FROM MORADOR 
+            WHERE id_residencia = %s"""
+        cursor.execute(sql, (id_residencia,))
+        return cursor.fetchall()
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao buscar moradores da residência: {err}")
+        return []
+    finally:
+        cursor.close()
+        # NÃO FECHAR A CONEXÃO AQUI, pois ela é global
+
+def criar_morador(cpf, nome, email, id_residencia, is_sindico, lista_telefones, foto_bytes):
+    # Aqui criamos uma nova conexão temporária para garantir transação segura (como no seu original)
+    conn_temp = get_db_connection()
+    cursor = conn_temp.cursor()
+    try:
+        # Adicionado foto_perfil (BLOB)
+        sql_morador = """
+            INSERT INTO MORADOR (cpf, nome, Email, id_residencia, sindico, foto_perfil) 
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(sql_morador, (cpf, nome, email, id_residencia, is_sindico, foto_bytes))
+        
+        sql_tel = "INSERT INTO TELEFONE_MORADOR (cpf_morador, numero) VALUES (%s, %s)"
+        for tel in lista_telefones:
+            if tel.strip(): 
+                cursor.execute(sql_tel, (cpf, tel.strip()))
+        
+        conn_temp.commit()
+        return True
+    except mysql.connector.Error as err:
+        conn_temp.rollback() 
+        st.error(f"Erro ao cadastrar morador: {err}")
+        return False
+    finally:
+        cursor.close()
+        conn_temp.close()
+
+def deletar_morador(cpf):
+    cursor = conexao.cursor(buffered=True)
+    try:
+        # CORREÇÃO: Nome da tabela ajustado para TELEFONE_MORADOR
+        cursor.execute("DELETE FROM TELEFONE_MORADOR WHERE cpf_morador = %s", (cpf,))
+        cursor.execute("DELETE FROM VEICULO WHERE morador_cpf = %s", (cpf,))
+        cursor.execute("DELETE FROM MORADOR WHERE cpf = %s", (cpf,))
+        
+        conexao.commit()
+        return True
+    except mysql.connector.Error as err:
+        conexao.rollback()
+        st.error(f"Erro ao excluir morador: {err}")
         return False
     finally:
         cursor.close()

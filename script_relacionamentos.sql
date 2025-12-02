@@ -42,7 +42,7 @@ CREATE TABLE RESIDENCIA (
     num_unidade INTEGER unsigned NOT NULL, 
     bloco VARCHAR(10),
     tipo VARCHAR(50),
-    condominio_cnpj VARCHAR(16),
+    condominio_cnpj VARCHAR(14),
     
     CONSTRAINT FK_residencia_condominio 
         FOREIGN KEY (condominio_cnpj) REFERENCES CONDOMINIO(cnpj)
