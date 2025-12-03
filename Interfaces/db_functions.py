@@ -639,7 +639,7 @@ def deletar_veiculo(placa):
 
 # Taxa
 def listar_taxas_residencia(id_residencia):
-    cursor = conexao.cursor()
+    cursor = conexao.cursor() 
     try:
         sql = """SELECT * FROM TAXA WHERE id_residencia = %s ORDER BY data_vencimento DESC"""
         cursor.execute(sql, (id_residencia,))
@@ -655,7 +655,7 @@ def criar_taxa(data_emissao, data_vencimento, valor, status_pagamento, id_reside
     try:
         sql = """
             INSERT INTO TAXA (data_emissao, data_vencimento, valor, status_pagamento, id_residencia)
-            VALUES (NOW(), %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s) 
         """
         cursor.execute(sql, (data_emissao, data_vencimento, valor, status_pagamento, id_residencia))
         conexao.commit()
@@ -669,6 +669,10 @@ def criar_taxa(data_emissao, data_vencimento, valor, status_pagamento, id_reside
 def editar_taxa(id_taxa, data_emissao, data_vencimento, valor, status_pagamento):
     cursor = conexao.cursor()
     try:
+        # Verifica se a conexão está ativa antes de tentar
+        if not conexao.is_connected():
+            conexao.reconnect()
+            
         sql = """
             UPDATE TAXA 
             SET data_emissao = %s, data_vencimento = %s, valor = %s, status_pagamento = %s
@@ -676,10 +680,15 @@ def editar_taxa(id_taxa, data_emissao, data_vencimento, valor, status_pagamento)
         """
         cursor.execute(sql, (data_emissao, data_vencimento, valor, status_pagamento, id_taxa))
         conexao.commit()
-        return True
+        
+        # Verifica se alguma linha foi realmente afetada
+        if cursor.rowcount == 0:
+            return False, "Nenhuma taxa encontrada com esse ID."
+            
+        return True, "Taxa atualizada com sucesso."
+        
     except mysql.connector.Error as err:
-        st.error(f"Erro ao editar taxa: {err}")
-        return False
+        return False, f"Erro técnico: {err}"
     finally:
         cursor.close()
 
@@ -700,8 +709,7 @@ def listar_multas_residencia(id_residencia):
     cursor = conexao.cursor()
     try:
         sql = """
-            SELECT id_multa, data_emissao, data_vencimento, status_pagamento, valor, descricao, id_residencia
-            FROM MULTA
+            SELECT * FROM MULTA
             WHERE id_residencia = %s
             ORDER BY data_vencimento DESC
         """
@@ -718,9 +726,10 @@ def criar_multa(data_emissao, data_vencimento, status_pagamento, valor, descrica
     try:
         sql = """
             INSERT INTO MULTA (data_emissao, data_vencimento, status_pagamento, valor, descricao, id_residencia)
-            VALUES (NOW(), %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s) 
         """
-        cursor.execute(sql, (data_emissao, data_vencimento, status_pagamento, valor, descricao, id_residencia))
+        
+        cursor.execute(sql, (data_emissao, data_vencimento, status_pagamento, valor_ajustado, descricao, id_residencia))
         conexao.commit()
         return True
     except mysql.connector.Error as err:

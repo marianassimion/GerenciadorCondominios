@@ -61,7 +61,7 @@ with st.container(border=True):
                     st.switch_page("pages/cadastroTelefone.py")
 
             with c_del:
-                if st.button(":material/delte:", key=f"del_{id_tel}", type="primary", help="Excluir telefone"):
+                if st.button(":material/delete:", key=f"del_{id_tel}", type="primary", help="Excluir telefone"):
                     if deletar_telefone(id_tel):
                         st.toast("Telefone excluído com sucesso!")
                         time.sleep(1.5) 
