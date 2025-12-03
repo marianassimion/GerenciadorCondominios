@@ -729,7 +729,7 @@ def criar_multa(data_emissao, data_vencimento, status_pagamento, valor, descrica
             VALUES (%s, %s, %s, %s, %s, %s) 
         """
         
-        cursor.execute(sql, (data_emissao, data_vencimento, status_pagamento, valor_ajustado, descricao, id_residencia))
+        cursor.execute(sql, (data_emissao, data_vencimento, status_pagamento, valor, descricao, id_residencia))
         conexao.commit()
         return True
     except mysql.connector.Error as err:

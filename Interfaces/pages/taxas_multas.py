@@ -50,15 +50,18 @@ with tab_taxas:
             if status == "Pago":
                 cor_status = "green"
                 icone_status = "✅"
-            else:
+            elif status == "Pendente":
                 cor_status = "orange"
                 icone_status = "⏳"
+            else:
+                cor_status = "red"
+                icone_status = "⛔"
 
             with st.container(border=True):
                 c_icon, c_details, c_status, c_actions = st.columns([0.5, 3, 1.5, 1])
 
                 with c_icon:
-                    st.markdown(":material/attach_money:") 
+                    st.image("./img/taxa.png", width=40) 
 
                 with c_details:
                     st.markdown(f"**Vencimento: {data_vencimento}**")
@@ -100,15 +103,18 @@ with tab_multas:
             if status == "Pago":
                 cor_status = "green"
                 icone_status = "✅"
-            else:
+            elif status == "Pendente":
                 cor_status = "orange"
                 icone_status = "⏳"
+            else:
+                cor_status = "red"
+                icone_status = "⛔"
 
             with st.container(border=True):
                 c_icon, c_details, c_status, c_actions = st.columns([0.5, 3, 1.5, 1])
 
                 with c_icon:
-                    st.markdown(":material/attach_money:") 
+                    st.image("./img/multa.png", width=30) 
 
                 with c_details:
                     st.markdown(f"**Vencimento: {data_vencimento}**")
@@ -130,8 +136,6 @@ with tab_multas:
                             st.rerun()
                         else:
                             st.error("Erro ao excluir.")
-
-st.divider()
 
 if st.button("Voltar para Residências", use_container_width=True):
     st.switch_page("pages/residencias.py")

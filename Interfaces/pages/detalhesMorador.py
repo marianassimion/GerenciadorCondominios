@@ -48,7 +48,7 @@ with st.container(border=True):
             c_icon, c_tel, c_edit, c_del = st.columns([0.4, 3, 0.5, 0.5], vertical_alignment="center")
 
             with c_icon:
-                st.markdown(":material/phone:") 
+                st.image("./img/telephone.png", width=30) 
 
             with c_tel:
                 st.markdown(f"**{numero_tel}**")
