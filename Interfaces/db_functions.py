@@ -387,18 +387,23 @@ def listar_moradores_condominio(cnpj_condominio):
     cursor = conexao.cursor()
     try:
         sql = """SELECT M.cpf, M.nome, M.email, M.sindico, 
-                   R.id_residencia, R.num_unidade, R.bloco
-            FROM MORADOR M
-            JOIN RESIDENCIA R ON M.id_residencia = R.id_residencia
-            WHERE R.condominio_cnpj = %s
-            ORDER BY R.bloco, R.num_unidade, M.nome"""
+                        R.id_residencia, R.num_unidade, R.bloco, R.tipo
+                 FROM MORADOR M
+                 INNER JOIN RESIDENCIA R ON M.id_residencia = R.id_residencia
+                 WHERE R.condominio_cnpj = %s
+                 ORDER BY R.bloco, R.num_unidade, M.nome"""
+                 
         cursor.execute(sql, (cnpj_condominio,))
         return cursor.fetchall()
+        
     except mysql.connector.Error as err:
         st.error(f"Erro ao listar moradores: {err}")
         return []
+        
     finally:
-        cursor.close()
+        if cursor:
+            cursor.close()
+        
 
 def obter_morador_por_id(cpf):
     cursor = conexao.cursor()
