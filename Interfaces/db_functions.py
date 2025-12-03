@@ -210,6 +210,25 @@ def obter_empregado_por_cpf(cpf):
     finally:
         cursor.close()
 
+def obter_media_salarial_por_condominio(cnpj):
+    try:
+        if not conexao.is_connected():
+            conexao.reconnect()
+        cursor = conexao.cursor()
+        
+        args = [cnpj, 0] 
+        
+        result = cursor.callproc("calcular_media_salario_por_condominio", args)
+        
+        media = result[1] # Pega o segundo argumento (o OUT)
+        cursor.close()
+        return media if media else 0.0
+    
+    except Exception as e:
+        print(f"Erro ao calcular média: {e}")
+        return 0.0
+    
+
 # --- [UPDATE] ---
 def atualizar_empregado(nome, cargo, matricula, data_admissao, salario, foto, cpf_original):
     cursor = conexao.cursor(buffered=True)
@@ -270,7 +289,6 @@ def criar_aviso(titulo, texto, id_administrador, condominio_cnpj):
 
 # --- [READ] ---
 def listar_avisos():
-    # Nota: Aqui cria-se uma nova conexão/cursor, independente da global
     local_conexao = get_db_connection()
     cursor = local_conexao.cursor()
     comando = """
@@ -287,8 +305,6 @@ def listar_avisos():
         return []
     finally:
         cursor.close()
-        # É boa prática fechar a conexão local se não for reutilizada, 
-        # mas como é get_db_connection com cache, o streamlit gerencia.
 
 # --- [DELETE] ---
 def deletar_aviso(id_aviso):
@@ -374,7 +390,6 @@ def buscar_residencias(cnpj_condominio, unidade=""):
 def obter_residencia_por_id(id_residencia):
     cursor = conexao.cursor(buffered=True)
     try:
-        # Nota: Corrigi a tabela de CONDOMINIO para RESIDENCIA, pois parecia um erro lógico
         cursor.execute("SELECT num_unidade, bloco, tipo, condominio_cnpj FROM RESIDENCIA WHERE id_residencia = %s", (id_residencia,))
         return cursor.fetchone()
     except mysql.connector.Error:
