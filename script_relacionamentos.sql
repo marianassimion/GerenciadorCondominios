@@ -24,7 +24,7 @@ CREATE TABLE ADMINISTRADOR (
 );
 
 CREATE TABLE CONDOMINIO (
-	cnpj 			varchar(16) PRIMARY KEY,
+	cnpj 			varchar(14) PRIMARY KEY,
     id_admin 		INTEGER NOT NULL,
     nome 			varchar(65) NOT NULL,
 	logradouro		varchar(100) NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE RESIDENCIA (
     num_unidade INTEGER unsigned NOT NULL, 
     bloco VARCHAR(10),
     tipo VARCHAR(50),
-    condominio_cnpj VARCHAR(16),
+    condominio_cnpj VARCHAR(14),
     
     CONSTRAINT FK_residencia_condominio 
         FOREIGN KEY (condominio_cnpj) REFERENCES CONDOMINIO(cnpj)
@@ -52,7 +52,7 @@ CREATE TABLE MORADOR (
     cpf VARCHAR(11) PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     Email VARCHAR(100) NOT NULL UNIQUE,
-    id_residencia INTEGER,
+    id_residencia INTEGER unsigned NOT NULL,
     sindico BOOLEAN NOT NULL DEFAULT FALSE, 
     
     CONSTRAINT FK_morador_residencia 
@@ -61,8 +61,8 @@ CREATE TABLE MORADOR (
 
 CREATE TABLE TELEFONE_MORADOR (
     id_telefone_morador INT PRIMARY KEY auto_increment,
-    cpf_morador VARCHAR(11),
-    numero VARCHAR(20),
+    cpf_morador VARCHAR(11) NOT NULL,
+    numero VARCHAR(11),
     
     CONSTRAINT FK_telefone_morador 
         FOREIGN KEY(cpf_morador) REFERENCES MORADOR(cpf) 
@@ -76,7 +76,7 @@ CREATE TABLE EMPREGADO (
     matricula integer unsigned UNIQUE,
     data_admissao date NOT NULL,
     salario decimal(10,2),
-    condominio_cnpj varchar(16),
+    condominio_cnpj varchar(14) NOT NULL,
 
     CONSTRAINT FK_empregado_condominio 
         FOREIGN KEY (condominio_cnpj) REFERENCES CONDOMINIO(cnpj)
@@ -98,7 +98,7 @@ CREATE TABLE TAXA (
     data_vencimento date NOT NULL,
     valor decimal(10,2),
     status_pagamento varchar(10) DEFAULT 'Pendente',
-    id_residencia integer,
+    id_residencia integer unsigned NOT NULL,
     
     CONSTRAINT FK_Taxa_Residencia 
         FOREIGN KEY(id_residencia) REFERENCES RESIDENCIA(id_residencia)
@@ -107,10 +107,11 @@ CREATE TABLE TAXA (
 CREATE TABLE MULTA (
     id_multa INTEGER AUTO_INCREMENT PRIMARY KEY,
     data_emissao date NOT NULL,
+    data_vencimento date NOT NULL,
     status_pagamento varchar(10) DEFAULT 'Pendente',
     valor DECIMAL(10, 2),
     descricao VARCHAR(220),
-    id_residencia integer,
+    id_residencia integer unsigned NOT NULL,
 
     CONSTRAINT FK_Multa_Residencia 
         FOREIGN KEY(id_residencia) REFERENCES RESIDENCIA(id_residencia)
@@ -122,7 +123,7 @@ CREATE TABLE AVISO (
     texto VARCHAR(220),
     data_aviso TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     id_administrador integer,
-    condominio_cnpj varchar(16),
+    condominio_cnpj varchar(14) NOT NULL,
 
     CONSTRAINT FK_aviso_administrador
         FOREIGN KEY(id_administrador) REFERENCES ADMINISTRADOR(id_administrador),
@@ -136,7 +137,7 @@ CREATE TABLE AREA_COMUM (
     nome VARCHAR(100) NOT NULL,
     descricao TEXT,
     capacidade INT,
-    condominio_cnpj VARCHAR(16) NOT NULL,
+    condominio_cnpj VARCHAR(14) NOT NULL,
     
     CONSTRAINT FK_area_comum_condominio 
         FOREIGN KEY (condominio_cnpj) REFERENCES CONDOMINIO(cnpj)

@@ -31,7 +31,7 @@ with st.container(height=500, border=True):
         id_res, numero, bloco, tipo = residencia
             
         with st.container(border=True):
-            c_icon, c_info, c_morador, c_taxa, c_multa, c_edit, c_del = st.columns([0.5, 4, 0.7, 0.7, 0.7, 0.7, 0.7], vertical_alignment="center")
+            c_icon, c_info, c_morador, c_taxa_multa, c_edit, c_del = st.columns([0.5, 4, 0.7, 0.7, 0.7, 0.7], vertical_alignment="center")
             
             c_icon.image("./img/apt.png", width=70)
             
@@ -39,15 +39,11 @@ with st.container(height=500, border=True):
                 
             if c_morador.button(":material/perm_identity:", key=f"morador_{id_res}", help="Moradores"):
                 st.session_state['detail_residencia'] = id_res                
-                st.switch_page("pages/moradores.py")
+                st.switch_page("pages/moradorResidencia.py")
 
-            if c_taxa.button(":material/attach_money:", key=f"taxa_{id_res}", help="Taxas"):
+            if c_taxa_multa.button(":material/attach_money:", key=f"taxa_{id_res}", help="Taxas e multas"):
                 st.session_state['detail_residencia'] = id_res                
-                st.switch_page("pages/taxas.py")
-
-            if c_multa.button(":material/article:", key=f"multa_{id_res}", help="Multas"):
-                st.session_state['detail_residencia'] = id_res                
-                st.switch_page("pages/multas.py")
+                st.switch_page("pages/taxas_multas.py")
             
             if c_edit.button(":material/edit_square:", key=f"edit_{id_res}", help="Editar residência"):
                 st.session_state['residencia_edit'] = id_res                
@@ -55,7 +51,7 @@ with st.container(height=500, border=True):
 
             if c_del.button(":material/delete:", key=f"del_{id_res}", help="Excluir residência"):
                 if deletar_residencia(id_res):
-                    st.success("Unidade removida!") 
+                    st.success("Residência removida!") 
                     time.sleep(1)
                     st.rerun()
                 else:

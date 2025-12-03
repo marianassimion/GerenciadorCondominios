@@ -39,5 +39,5 @@ if enviado:
         if sucesso:
             st.success("Aviso publicado com sucesso!")
             time.sleep(1.5)
-            st.switch_page("pages/listagemAvisos.py")
+            st.switch_page("pages/detalharCondominio.py")
         

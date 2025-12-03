@@ -56,28 +56,11 @@ with st.container(height=400, border=True):
                 st.rerun()
                 
             if c_del.button(":material/delete:", key=f"del_{cnpj_c}", help="Excluir condomínio"):
-                # if deletar_condominio(cnpj_c):
-                #     st.success("Condomínio excluído!") 
-                #     st.rerun()
-                st.session_state["confirmar_delete"] = True
-
-            # Se o usuário clicou no botão, abre a confirmação
-            if st.session_state.get("confirmar_delete", False):
-                st.warning("Tem certeza que deseja excluir este condomínio? Esta ação não pode ser desfeita.")
-
-                col1, col2 = st.columns(2)
-
-                with col1:
-                    if st.button("Sim, excluir DEFINITIVAMENTE"):
-                        sucesso = deletar_condominio(cnpj_c)
-                        if sucesso:
-                            st.success("Condomínio excluído com sucesso.")
-                        st.session_state["confirmar_delete"] = False
-
-                with col2:
-                    if st.button("Cancelar"):
-                        st.session_state["confirmar_delete"] = False
-                        st.info("Ação cancelada.")   
+                if deletar_condominio(cnpj_c):
+                    st.success("Condomínio excluído!") 
+                    st.time.sleep(1)
+                    st.rerun()
+                    
 
 if st.button("Cadastrar Novo Condomínio", type="primary", use_container_width=True):
     st.switch_page("pages/cadastroCondominio.py")
