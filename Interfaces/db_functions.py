@@ -68,11 +68,11 @@ def login_sessao():
 # ==============================================================================
 
 # --- [CREATE] ---
-def criar_condominio(nome, id_admin, cnpj, logradouro, bairro, cidade, uf, cep):
+def criar_condominio(cnpj, nome, logradouro, bairro, cidade, uf, cep):
     cursor = conexao.cursor(buffered=True)
     try:
-        cmd = "INSERT INTO condominio (nome, id_admin, cnpj, logradouro, bairro, cidade, uf, cep) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-        cursor.execute(cmd, (nome, id_admin, cnpj, logradouro, bairro, cidade, uf, cep))
+        cmd = "INSERT INTO condominio (cnpj, nome,  logradouro, bairro, cidade, uf, cep) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(cmd, (cnpj, nome,  logradouro, bairro, cidade, uf, cep))
         conexao.commit()
         return True
     except mysql.connector.Error:
@@ -186,6 +186,7 @@ def criar_empregado(cpf, nome, cargo, matricula, data_admissao, salario, cnpj_at
         cursor.close()
 
 # --- [READ] ---
+
 def obter_empregados(condominio_cnpj):
     cursor = conexao.cursor(buffered=True)
     comando = "SELECT nome, cargo, matricula, data_admissao, salario, cpf, foto FROM EMPREGADO WHERE condominio_cnpj = %s"
@@ -208,6 +209,25 @@ def obter_empregado_por_cpf(cpf):
         return None
     finally:
         cursor.close()
+
+def obter_media_salarial_por_condominio(cnpj):
+    try:
+        if not conexao.is_connected():
+            conexao.reconnect()
+        cursor = conexao.cursor()
+        
+        args = [cnpj, 0] 
+        
+        result = cursor.callproc("calcular_media_salario_por_condominio", args)
+        
+        media = result[1] # Pega o segundo argumento (o OUT)
+        cursor.close()
+        return media if media else 0.0
+    
+    except Exception as e:
+        print(f"Erro ao calcular média: {e}")
+        return 0.0
+    
 
 # --- [UPDATE] ---
 def atualizar_empregado(nome, cargo, matricula, data_admissao, salario, foto, cpf_original):
@@ -269,7 +289,6 @@ def criar_aviso(titulo, texto, id_administrador, condominio_cnpj):
 
 # --- [READ] ---
 def listar_avisos():
-    # Nota: Aqui cria-se uma nova conexão/cursor, independente da global
     local_conexao = get_db_connection()
     cursor = local_conexao.cursor()
     comando = """
@@ -286,8 +305,6 @@ def listar_avisos():
         return []
     finally:
         cursor.close()
-        # É boa prática fechar a conexão local se não for reutilizada, 
-        # mas como é get_db_connection com cache, o streamlit gerencia.
 
 # --- [DELETE] ---
 def deletar_aviso(id_aviso):
@@ -373,7 +390,6 @@ def buscar_residencias(cnpj_condominio, unidade=""):
 def obter_residencia_por_id(id_residencia):
     cursor = conexao.cursor(buffered=True)
     try:
-        # Nota: Corrigi a tabela de CONDOMINIO para RESIDENCIA, pois parecia um erro lógico
         cursor.execute("SELECT num_unidade, bloco, tipo, condominio_cnpj FROM RESIDENCIA WHERE id_residencia = %s", (id_residencia,))
         return cursor.fetchone()
     except mysql.connector.Error:
@@ -435,6 +451,82 @@ def deletar_morador(cpf):
     except mysql.connector.Error as err:
         conexao.rollback()
         st.error(f"Erro ao excluir morador: {err}")
+        return False
+    finally:
+        cursor.close()
+
+
+# ==============================================================================
+# ENTIDADE: ÁREA COMUM
+# ==============================================================================
+
+# --- [CREATE] ---
+def criar_area_comum(nome, descricao, capacidade, condominio_cnpj):
+    cursor = conexao.cursor()
+    try:
+        cmd = "INSERT INTO AREA_COMUM (nome, descricao, capacidade, condominio_cnpj) VALUES (%s, %s, %s, %s)"
+        cursor.execute(cmd, (nome, descricao, capacidade, condominio_cnpj))
+        conexao.commit()
+        return True
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao criar área comum: {err}")
+        return False
+    finally:
+        cursor.close()
+
+# --- [READ] ---
+def obter_area_comum(id_a):
+    cursor = conexao.cursor(buffered=True)
+    comando = "SELECT nome, descricao, capacidade FROM AREA_COMUM WHERE id_area_comum = %s"
+    try:
+        cursor.execute(comando, (id_a,))
+        return cursor.fetchall()
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao buscar áreas comuns: {err}")
+        return None
+    finally:
+        cursor.close()
+
+def listar_areas_comuns(condominio_cnpj):
+    local_conexao = get_db_connection()
+    cursor = local_conexao.cursor()
+    comando = """SELECT id_area_comum, nome, descricao, capacidade FROM AREA_COMUM WHERE condominio_cnpj = %s """
+    try:
+        cursor.execute(comando, (condominio_cnpj, ))
+        return cursor.fetchall()
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao listar áreas comuns: {err}")
+        return []
+    finally:
+        cursor.close()
+
+# --- [UPDATE] ---
+def atualizar_area_comum(id_area_comum, nome, descricao, capacidade):
+    cursor = conexao.cursor(buffered=True)
+    cmd = "UPDATE AREA_COMUM SET nome=%s, descricao=%s, capacidade=%s WHERE id_area_comum=%s"
+    try:
+        cursor.execute(cmd, (nome, descricao, capacidade, id_area_comum))
+        conexao.commit()
+        return True
+    
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao atualizar área comum: {err}")
+        conexao.rollback()
+        return False
+    
+    finally:
+        cursor.close()
+
+# --- [DELETE] ---
+def deletar_area_comum(id_area_comum):
+    cursor = conexao.cursor(buffered=True)
+    try:
+        cursor.execute("DELETE FROM AREA_COMUM WHERE id_area_comum=%s", (id_area_comum,))
+        conexao.commit()
+        return True
+    except mysql.connector.Error as err:
+        st.error(f"Erro ao deletar área comum: {err}")
+        conexao.rollback()
         return False
     finally:
         cursor.close()

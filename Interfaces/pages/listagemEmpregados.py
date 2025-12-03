@@ -1,6 +1,6 @@
 import streamlit as st
 import time
-from db_functions import obter_condominio_por_cnpj, obter_empregados, deletar_empregado
+from db_functions import obter_condominio_por_cnpj, obter_empregados, deletar_empregado, obter_media_salarial_por_condominio
 
 st.set_page_config(page_title="Listagem de Empregados")
 
@@ -18,6 +18,8 @@ if st.button("Voltar para Condomínio"):
 
 dados_condominio = obter_condominio_por_cnpj(cnpj_atual)
 empregados = obter_empregados(cnpj_atual)
+id_condominio = dados_condominio[0]
+media_salarial = obter_media_salarial_por_condominio(cnpj_atual)
 
 col_tit, col_btn = st.columns([3, 1], vertical_alignment="bottom")
 col_tit.subheader("Quadro de Funcionários")
@@ -52,7 +54,7 @@ if empregados:
                 c6.image(foto_e, width=60)
 
             else: 
-                st.image("https://via.placeholder.com/150?text=Sem+Foto", width=60)
+                c6.image("https://via.placeholder.com/150?text=Sem+Foto", width=60)
 
 
             with c_edit:
@@ -70,3 +72,5 @@ if empregados:
 
 else:
     st.info("Nenhum funcionário cadastrado neste condomínio.")
+
+st.metric(label="Média Salarial do Condomínio", value=f"R$ {media_salarial:,.2f}")

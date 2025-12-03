@@ -28,7 +28,6 @@ with st.form("form_cadastro_condominio", height=600):
 
     enviado = st.form_submit_button("Salvar Cadastro", type="primary", use_container_width=True)
     cancelar = st.form_submit_button("Cancelar", use_container_width=True)
-
 if cancelar:
     st.switch_page("pages/home.py")
 
@@ -38,9 +37,15 @@ if enviado:
         st.warning("Os campos **Nome** e **CNPJ** são obrigatórios.")
     if not cep or not cidade or not uf or not logradouro or not bairro:
         print("Os campos de endereço são obrigatórios!")
+
+    print((cnpj, nome, logradouro, bairro, cidade, uf, cep))
+    sucesso = criar_condominio(cnpj, nome, logradouro, bairro, cidade, uf, cep)
+
+    if sucesso:
+        print('criou')
+        st.success(f"Condomínio **{nome}** cadastrado com sucesso")
+        time.sleep(1) 
+        st.switch_page("pages/home.py") 
+
     else:
-        cadastrar_condominio = criar_condominio(nome, id_admin, cnpj, logradouro, bairro, cidade, uf, cep)
-        if cadastrar_condominio:
-            st.success(f"Condomínio **{nome}** cadastrado com sucesso")
-            time.sleep(1) 
-            st.switch_page("pages/home.py") 
+        st.error("Erro ao cadastrar condomínio. Verifique os dados.")

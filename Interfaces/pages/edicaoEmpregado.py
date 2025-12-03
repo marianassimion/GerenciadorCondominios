@@ -60,6 +60,6 @@ if dados:
                 time.sleep(1)
                 
                 st.session_state.details_condominio_mode = True 
-                st.switch_page("pages/detalharCondominio.py")
+                st.switch_page("pages/listagemEmpregados.py")
 else:
     st.error("Empregado não encontrado.")
