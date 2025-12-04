@@ -118,12 +118,14 @@ def atualizar_condominio(cnpj_original, nome, logradouro, bairro, cidade, uf, ce
 def deletar_condominio(cnpj):
     cursor = conexao.cursor(buffered=True)
     try:
+        # RESIDÊNCIAS E DEPENDÊNCIAS
         cursor.execute("SELECT id_residencia FROM RESIDENCIA WHERE condominio_cnpj = %s", (cnpj,))
         residencias = cursor.fetchall()
 
         for (id_res,) in residencias:
             cursor.execute("DELETE FROM MULTA WHERE id_residencia = %s", (id_res,))
             cursor.execute("DELETE FROM TAXA WHERE id_residencia = %s", (id_res,))
+
             cursor.execute("SELECT cpf FROM MORADOR WHERE id_residencia = %s", (id_res,))
             moradores = cursor.fetchall()
 
@@ -134,7 +136,19 @@ def deletar_condominio(cnpj):
             cursor.execute("DELETE FROM MORADOR WHERE id_residencia = %s", (id_res,))
             cursor.execute("DELETE FROM RESIDENCIA WHERE id_residencia = %s", (id_res,))
 
+        
+        # EMPREGADOS E LOGS
+        # Buscar CPFs dos empregados para remover logs antes
+        cursor.execute("SELECT cpf FROM EMPREGADO WHERE condominio_cnpj = %s", (cnpj,))
+        empregados = cursor.fetchall()
+
+        for (cpf_empregado,) in empregados:
+            cursor.execute("DELETE FROM log_alteracao_salario WHERE cpf_empregado = %s", (cpf_empregado,))
+
+        # Agora apaga empregados
         cursor.execute("DELETE FROM EMPREGADO WHERE condominio_cnpj = %s", (cnpj,))
+
+        # ÁREA COMUM, AVISO, CONDOMÍNIO
         cursor.execute("DELETE FROM AREA_COMUM WHERE condominio_cnpj = %s", (cnpj,))
         cursor.execute("DELETE FROM AVISO WHERE condominio_cnpj = %s", (cnpj,))
         cursor.execute("DELETE FROM CONDOMINIO WHERE cnpj = %s", (cnpj,))
@@ -143,7 +157,7 @@ def deletar_condominio(cnpj):
         return True
 
     except mysql.connector.Error as err:
-        conexao.rollback() 
+        conexao.rollback()
         if err.errno == 1451:
             st.error(
                 "Não é possível excluir este condomínio pois ainda existem dados associados "
@@ -155,6 +169,7 @@ def deletar_condominio(cnpj):
 
     finally:
         cursor.close()
+
 
 # ==============================================================================
 # ENTIDADE: EMPREGADO
