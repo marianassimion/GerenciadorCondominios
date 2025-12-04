@@ -40,7 +40,7 @@ if enviado:
         sucesso = criar_residencia(num_unidade, bloco, tipo, cnpj)
         
         if sucesso:
-            st.success(f"Unidade **{num_unidade} - {bloco}** cadastrada com sucesso!")
+            st.success(f"Residência **{num_unidade} - {bloco}** cadastrada com sucesso!")
             time.sleep(1.5)
             st.switch_page("pages/residencias.py") 
         else:
