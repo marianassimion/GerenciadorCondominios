@@ -6,11 +6,6 @@ st.set_page_config(page_title="Detalhes do Morador", layout="centered")
 
 login_sessao()
 
-if 'detail_residencia' not in st.session_state:
-    st.warning("Nenhuma residência selecionada.")
-    time.sleep(1)
-    st.switch_page("pages/residencias.py") 
-
 id_residencia = st.session_state.detail_residencia
 
 if 'detail_morador' not in st.session_state: 
@@ -45,7 +40,7 @@ with st.container(border=True):
         id_tel, numero_tel = item 
 
         with st.container():
-            c_icon, c_tel, c_edit, c_del = st.columns([0.4, 3, 0.5, 0.5], vertical_alignment="center")
+            c_icon, c_tel, c_del = st.columns([0.4, 3, 0.5], vertical_alignment="center")
 
             with c_icon:
                 st.markdown(":material/phone:") 
@@ -53,15 +48,8 @@ with st.container(border=True):
             with c_tel:
                 st.markdown(f"**{numero_tel}**")
 
-            with c_edit:
-                if st.button(":material/edit_square:", key=f"edit_{id_tel}", help="Editar telefone"):
-                    st.session_state['telefone_editar_id'] = id_tel
-                    st.session_state['telefone_editar_numero'] = numero_tel
-                    st.session_state['morador_phone'] = cpf 
-                    st.switch_page("pages/cadastroTelefone.py")
-
             with c_del:
-                if st.button(":material/delte:", key=f"del_{id_tel}", type="primary", help="Excluir telefone"):
+                if st.button(":material/delete:", key=f"del_{id_tel}", type="primary", help="Excluir telefone"):
                     if deletar_telefone(id_tel):
                         st.toast("Telefone excluído com sucesso!")
                         time.sleep(1.5) 
@@ -72,4 +60,4 @@ with st.container(border=True):
 
 with st.container():
     if st.button("Voltar para Moradores", use_container_width=True):
-        st.switch_page("pages/moradorResidencia.py")
+        st.switch_page("pages/moradorCondominio.py")

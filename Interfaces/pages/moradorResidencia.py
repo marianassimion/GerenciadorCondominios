@@ -1,6 +1,6 @@
 import streamlit as st
 import time
-from db_functions import obter_residencia_por_id,listar_moradores_residencia, deletar_morador, login_sessao
+from db_functions import obter_residencia_por_id,listar_moradores_residencia, listar_moradores_residencia, deletar_morador, login_sessao
 
 st.set_page_config(page_title="Moradores", layout="centered")
 

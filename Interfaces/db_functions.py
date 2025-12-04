@@ -446,7 +446,7 @@ def listar_moradores_condominio(cnpj_condominio):
     cursor = conexao.cursor()
     try:
         sql = """SELECT M.cpf, M.nome, M.email, M.sindico, 
-                   R.id_residencia, R.num_unidade, R.bloco
+                   R.id_residencia, R.num_unidade, R.bloco, R.tipo
             FROM MORADOR M
             JOIN RESIDENCIA R ON M.id_residencia = R.id_residencia
             WHERE R.condominio_cnpj = %s
