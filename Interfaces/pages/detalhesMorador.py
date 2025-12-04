@@ -48,7 +48,7 @@ with st.container(border=True):
             c_icon, c_tel, c_edit, c_del = st.columns([0.4, 3, 0.5, 0.5], vertical_alignment="center")
 
             with c_icon:
-                st.image("./img/telephone.png", width=30) 
+                st.markdown(":material/phone:") 
 
             with c_tel:
                 st.markdown(f"**{numero_tel}**")
@@ -61,7 +61,7 @@ with st.container(border=True):
                     st.switch_page("pages/cadastroTelefone.py")
 
             with c_del:
-                if st.button(":material/delete:", key=f"del_{id_tel}", type="primary", help="Excluir telefone"):
+                if st.button(":material/delte:", key=f"del_{id_tel}", type="primary", help="Excluir telefone"):
                     if deletar_telefone(id_tel):
                         st.toast("Telefone excluído com sucesso!")
                         time.sleep(1.5) 

@@ -47,7 +47,7 @@ with st.container(height=400, border=True):
 
             if c_mor.button(":material/perm_identity:", key=f"mor_{cnpj_c}", help="Moradores"):
                 st.session_state['detail_cnpj'] = cnpj_c                
-                st.switch_page("pages/moradorCondominio.py")
+                st.switch_page("pages/moradores.py")
                 st.rerun()
 
             if c_edit.button(":material/edit_square:", key=f"edit_{cnpj_c}", help="Editar condomínio"):

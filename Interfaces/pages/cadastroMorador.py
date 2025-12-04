@@ -25,7 +25,7 @@ with st.form(key='cadastro_morador_form'):
     
     c3, c4 = st.columns(2)
     s = c3.selectbox("Síndico*", ["Sim", "Não"])
-    telefone = c4.text_input('Telefone*', placeholder="Apenas números", max_chars=11)
+    telefone = c4.text_input('Telefone*', placeholder="Apenas números", max_chars=20)
     
     b1, b2 = st.columns(2)
     with b1:
@@ -36,7 +36,7 @@ with st.form(key='cadastro_morador_form'):
 if cancelar:   
     st.switch_page("pages/moradorResidencia.py")
 
-# SALVANDO MORADOR E TELEFONE
+# SALVANDO MORADOR 
 if enviado:
     if not nome or not cpf:
         st.warning("Por favor, preencha o Nome e o CPF.")
