@@ -54,7 +54,7 @@ if empregados:
                 c6.image(foto_e, width=60)
 
             else: 
-                c6.image("https://via.placeholder.com/150?text=Sem+Foto", width=60)
+                c6.image("https://cdn-icons-png.flaticon.com/512/149/149071.png", width=60)
 
 
             with c_edit:
