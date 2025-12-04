@@ -223,6 +223,28 @@ def obter_media_salarial_por_condominio(cnpj):
         print(f"Erro ao calcular média: {e}")
         return 0.0
     
+def obter_historico_salarios(cpf):
+    try:
+        if not conexao.is_connected():
+            conexao.reconnect()
+
+        cursor = conexao.cursor(dictionary=True)
+
+        query = """
+        SELECT salario_antigo, salario_novo, data_alteracao
+        FROM LOG_ALTERACAO_SALARIO
+        WHERE cpf_empregado = %s
+        ORDER BY data_alteracao DESC
+        """
+        cursor.execute(query, (cpf,))
+        resultado = cursor.fetchall()
+        cursor.close()
+
+        return resultado
+
+    except Exception as e:
+        print(f"Erro ao obter histórico de salários: {e}")
+        return []
 
 # --- [UPDATE] ---
 def atualizar_empregado(nome, cargo, matricula, data_admissao, salario, foto, cpf_original):

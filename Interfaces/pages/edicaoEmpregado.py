@@ -1,6 +1,6 @@
 import streamlit as st
 import time
-from db_functions import obter_empregado_por_cpf, atualizar_empregado
+from db_functions import obter_empregado_por_cpf, atualizar_empregado, obter_historico_salarios
 
 st.set_page_config(page_title="Editar Empregado")
 
@@ -20,32 +20,55 @@ st.title("Editar Empregado")
 
 dados = obter_empregado_por_cpf(cpf_atual)
 
+
 if dados:
     nome_at, cargo_at, mat_at, data_at, sal_at, cpf_at, foto_at = dados
 
     with st.form("form_editar_empregado"):
         st.caption(f"Editando funcionário (CPF: {cpf_atual})")
-        
+
+        # # # DADOS
+        st.subheader("Dados do Funcionário")
         nome = st.text_input("Nome Completo", value=nome_at)
         
         c1, c2 = st.columns(2)
-        # CPF Bloqueado 
-        c1.text_input("CPF", value=cpf_at, disabled=True) 
+        c1.text_input("CPF", value=cpf_at, disabled=True) # CPF BLOQUEADO
         cargo = c2.text_input("Cargo", value=cargo_at)
         
         c3, c4, c5 = st.columns(3)
         matricula = c3.text_input("Matrícula", value=str(mat_at))
         data_adm = c4.date_input("Data de Admissão", value=data_at)
         salario = c5.number_input("Salário", value=float(sal_at), step=100.0)
-        st.write("Foto atual:")
-        if foto_at:
-            st.image(foto_at, width=200)
-        else:
-            st.info("Este funcionário não possui foto cadastrada.")
 
-        foto = st.file_uploader("Foto do funcionário", type=["jpg", "jpeg", "png"])
+        # # # FOTO
+        st.divider()
+        st.subheader("Foto do Funcionário")
+
+        st.write("Foto atual:") 
+        if foto_at: 
+            st.image(foto_at, width=200) 
+        else: 
+            st.info("Este funcionário não possui foto cadastrada.") 
+        foto = st.file_uploader("Foto do funcionário", type=["jpg", "jpeg", "png"]) 
+            
         foto_bytes = foto.read() if foto else None
 
+        # # # HISTÓRICO
+        st.divider()
+        st.subheader("Histórico de Alterações de Salário")
+
+        historico = obter_historico_salarios(cpf_atual)
+
+        with st.expander("📄 Mostrar histórico de salários", expanded=False):
+            if not historico:
+                st.info("Nenhuma alteração salarial registrada.")
+            else:
+                for item in historico:
+                    st.write(
+                        f"**{item['data_alteracao']}** — "
+                        f"{item['salario_antigo']} → **{item['salario_novo']}**"
+                    )
+        
         salvar = st.form_submit_button("Salvar Alterações", type="primary", use_container_width=True)
 
     # --- LÓGICA DE SALVAR ---
