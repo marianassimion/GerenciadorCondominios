@@ -1,5 +1,6 @@
 import streamlit as st
 from db_functions import *
+import time
 
 # Conexão com o banco de dados
 conexao = get_db_connection()
@@ -19,7 +20,6 @@ with st.container(border=True):
     c4.button(":material/logout:", key="logout")
 
 st.markdown("<div style='text-align: center; font-size: 24px;'>Condomínios</div>", unsafe_allow_html=True)
-st.text_input("Buscar", placeholder="🔍 Digite o nome...", label_visibility="collapsed")
     
 lista_condominios = listar_condominios()
     

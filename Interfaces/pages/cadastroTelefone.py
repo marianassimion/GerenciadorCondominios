@@ -30,7 +30,7 @@ with st.form(key='cadastro_telefone_form'):
 
 
 if cancelar:   
-    st.switch_page("pages/moradorResidencia.py")
+    st.switch_page("pages/listagemTelefones.py")
 
 # SALVANDO TELEFONE
 if enviado:
@@ -46,6 +46,6 @@ if enviado:
                 st.session_state.details_condominio_mode = True
             
             time.sleep(1.5)
-            st.switch_page("pages/moradorResidencia.py")
+            st.switch_page("pages/listagemTelefones.py")
         else:
             st.error("Erro ao salvar no banco de dados.")

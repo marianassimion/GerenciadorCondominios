@@ -737,7 +737,7 @@ def criar_taxa(data_emissao, data_vencimento, valor, status_pagamento, id_reside
     try:
         sql = """
             INSERT INTO TAXA (data_emissao, data_vencimento, valor, status_pagamento, id_residencia)
-            VALUES (NOW(), %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s)
         """
         cursor.execute(sql, (data_emissao, data_vencimento, valor, status_pagamento, id_residencia))
         conexao.commit()
@@ -746,6 +746,8 @@ def criar_taxa(data_emissao, data_vencimento, valor, status_pagamento, id_reside
         st.error(f"Erro ao criar taxa: {err}")
         return False
     finally:
+        cursor.close()
+
         cursor.close()
 
 def editar_taxa(id_taxa, data_emissao, data_vencimento, valor, status_pagamento):
@@ -800,7 +802,7 @@ def criar_multa(data_emissao, data_vencimento, status_pagamento, valor, descrica
     try:
         sql = """
             INSERT INTO MULTA (data_emissao, data_vencimento, status_pagamento, valor, descricao, id_residencia)
-            VALUES (NOW(), %s, %s, %s, %s, %s)
+            VALUES  (%s, %s, %s, %s, %s, %s)
         """
         cursor.execute(sql, (data_emissao, data_vencimento, status_pagamento, valor, descricao, id_residencia))
         conexao.commit()

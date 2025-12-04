@@ -49,4 +49,4 @@ if enviado:
                 
             st.switch_page("pages/taxas_multas.py")
         else:
-            st.error("Erro ao cadastrar taxa. Verifique os dados.")
+            st.error("Erro ao cadastrar multa. Verifique os dados.")

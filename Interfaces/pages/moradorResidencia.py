@@ -34,8 +34,8 @@ with st.container(height=500, border=True):
 
         with st.container(border=True):
 
-            c_icon, c_info, c_det, c_veic, c_tel, c_edit, c_del = st.columns(
-                [0.7, 4, 0.7, 0.7, 0.7, 0.7, 0.7],
+            c_icon, c_info, c_veic, c_tel, c_edit, c_del = st.columns(
+                [0.7, 4, 0.7, 0.7, 0.7, 0.7],
                 vertical_alignment="center"
             )
 
@@ -45,10 +45,6 @@ with st.container(height=500, border=True):
             c_info.caption(f"CPF: {cpf}")
             c_info.caption(email)
 
-            if c_det.button(":material/visibility:", key=f"det_{cpf}", help="Detalhes"):
-                st.session_state['detail_morador'] = cpf
-                st.switch_page("pages/detalhesMorador.py")
-
             if c_veic.button(":material/directions_car:", key=f"veic_{cpf}", help="Veículos"):
                 st.session_state['veiculo_morador'] = cpf
                 st.switch_page("pages/veiculos.py")
@@ -57,9 +53,9 @@ with st.container(height=500, border=True):
                 st.session_state['morador_edit'] = cpf
                 st.switch_page("pages/edicaoMorador.py")
 
-            if c_tel.button(":material/phone_enabled:", key=f"tel_{cpf}", help="Cadastrar novo telefone"):
+            if c_tel.button(":material/phone_enabled:", key=f"tel_{cpf}", help="Telefones"):
                 st.session_state['morador_phone'] = cpf
-                st.switch_page("pages/cadastroTelefone.py")
+                st.switch_page("pages/listagemTelefones.py")
 
             if c_del.button(":material/delete:", key=f"del_{cpf}", help="Excluir Morador"):
                 if deletar_morador(cpf):
