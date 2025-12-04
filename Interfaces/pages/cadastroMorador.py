@@ -49,7 +49,7 @@ if enviado:
             telefone_criado = criar_telefone(cpf, telefone) 
 
         if morador_criado and telefone_criado:
-            st.success(f"Morador **{nome}** cadastrado com sucesso!")
+            st.success(f"Morador {nome} cadastrado com sucesso!")
             time.sleep(1.5)
             
             if 'details_condominio_mode' in st.session_state:

@@ -77,13 +77,15 @@ def criar_condominio(cnpj, id_admin, nome, logradouro, bairro, cidade, uf, cep):
         cursor.close()
 
 # --- [READ] ---
-def listar_condominios():
-    cursor = conexao.cursor(buffered=True) 
+def listar_condominios(id_admin):
+    cursor = conexao.cursor() 
     try:
-        cursor.execute("SELECT cnpj, nome, logradouro, bairro, cidade, uf, cep FROM CONDOMINIO")
+        sql = "SELECT cnpj, id_admin, nome, logradouro, bairro, cidade, uf, cep FROM CONDOMINIO WHERE id_admin = %s"
+        cursor.execute(sql, (id_admin, )) 
+        
         return cursor.fetchall()
     except mysql.connector.Error as err:
-        st.error(f"Erro: {err}")
+        st.error(f"Erro ao listar condomínios: {err}")
         return []
     finally:
         cursor.close()
@@ -112,50 +114,47 @@ def atualizar_condominio(cnpj_original, nome, logradouro, bairro, cidade, uf, ce
     finally:
         cursor.close()
 
-# --- [DELETE] ---
+# --- DELETE ---
 def deletar_condominio(cnpj):
     cursor = conexao.cursor(buffered=True)
     try:
-        # Excluir dependências em cascata manualmente
         cursor.execute("SELECT id_residencia FROM RESIDENCIA WHERE condominio_cnpj = %s", (cnpj,))
         residencias = cursor.fetchall()
 
         for (id_res,) in residencias:
             cursor.execute("DELETE FROM MULTA WHERE id_residencia = %s", (id_res,))
             cursor.execute("DELETE FROM TAXA WHERE id_residencia = %s", (id_res,))
-            cursor.execute("DELETE FROM VISITANTE WHERE id_residencia = %s", (id_res,))
-
             cursor.execute("SELECT cpf FROM MORADOR WHERE id_residencia = %s", (id_res,))
             moradores = cursor.fetchall()
 
             for (cpf_morador,) in moradores:
                 cursor.execute("DELETE FROM VEICULO WHERE morador_cpf = %s", (cpf_morador,))
-                cursor.execute("DELETE FROM TELEFONE_MORADOR WHERE cpf = %s", (cpf_morador,))
+                cursor.execute("DELETE FROM TELEFONE_MORADOR WHERE cpf_morador = %s", (cpf_morador,))
 
             cursor.execute("DELETE FROM MORADOR WHERE id_residencia = %s", (id_res,))
             cursor.execute("DELETE FROM RESIDENCIA WHERE id_residencia = %s", (id_res,))
 
         cursor.execute("DELETE FROM EMPREGADO WHERE condominio_cnpj = %s", (cnpj,))
+        cursor.execute("DELETE FROM AREA_COMUM WHERE condominio_cnpj = %s", (cnpj,))
+        cursor.execute("DELETE FROM AVISO WHERE condominio_cnpj = %s", (cnpj,))
         cursor.execute("DELETE FROM CONDOMINIO WHERE cnpj = %s", (cnpj,))
 
         conexao.commit()
         return True
 
     except mysql.connector.Error as err:
+        conexao.rollback() 
         if err.errno == 1451:
             st.error(
-                "Não é possível excluir este condomínio pois possui dependências associadas. "
-                "Limpe os dados associados antes de excluir."
+                "Não é possível excluir este condomínio pois ainda existem dados associados "
+                "(verifique se há dependências não mapeadas)."
             )
         else:
             st.error(f"Erro ao deletar condomínio: {err}")
-        
-        conexao.rollback()
         return False
 
     finally:
         cursor.close()
-
 
 # ==============================================================================
 # ENTIDADE: EMPREGADO
@@ -436,19 +435,28 @@ def editar_residencia(id_residencia, num_unidade, bloco, tipo):
         cursor.close()
 
 def deletar_residencia(id_residencia):
-    cursor = conexao.cursor()
+    cursor = conexao.cursor(buffered=True) 
     try:
+        cursor.execute("SELECT cpf FROM MORADOR WHERE id_residencia = %s", (id_residencia,))
+        moradores = cursor.fetchall()
+
+        for (cpf_morador,) in moradores:
+            cursor.execute("DELETE FROM VEICULO WHERE morador_cpf = %s", (cpf_morador,))
+            cursor.execute("DELETE FROM TELEFONE_MORADOR WHERE cpf_morador = %s", (cpf_morador,))
+            cursor.execute("DELETE FROM MORADOR WHERE cpf = %s", (cpf_morador,))
+
         cursor.execute("DELETE FROM MULTA WHERE id_residencia = %s", (id_residencia,))
         cursor.execute("DELETE FROM TAXA WHERE id_residencia = %s", (id_residencia,))
-        cursor.execute("UPDATE MORADOR SET id_residencia = NULL WHERE id_residencia = %s", (id_residencia,))
         cursor.execute("DELETE FROM RESIDENCIA WHERE id_residencia = %s", (id_residencia,))
 
         conexao.commit()
         return True
-    except Exception as e:
+
+    except mysql.connector.Error as err:
         conexao.rollback()
-        st.error(f"Erro ao deletar residência: {e}")
+        st.error(f"Erro ao deletar residência: {err}")
         return False
+        
     finally:
         cursor.close()
 
@@ -630,26 +638,45 @@ def listar_veiculos_morador(cpf_morador):
     finally:
         cursor.close()
 
-def listar_veiculos_condominio(cnpj_condominio):
+def obter_veiculos_por_condominio(cnpj_condominio):
     cursor = conexao.cursor()
-    try:
-        sql = """
-            SELECT V.placa, V.modelo, V.cor, 
-                   M.nome AS morador, M.cpf AS morador_cpf,
-                   R.num_unidade, R.bloco
-            FROM VEICULO V
-            JOIN MORADOR M ON V.morador_cpf = M.cpf
-            JOIN RESIDENCIA R ON M.id_residencia = R.id_residencia
-            WHERE R.condominio_cnpj = %s
-            ORDER BY R.bloco, R.num_unidade, V.modelo
-        """
-        cursor.execute(sql, (cnpj_condominio,))
-        return cursor.fetchall()
-    except mysql.connector.Error as err:
-        st.error(f"Erro ao listar veículos do condomínio: {err}")
-        return []
-    finally:
-        cursor.close()
+    
+    sql = """
+        SELECT Unidade, Proprietario, CPF, Modelo, Cor, Placa 
+        FROM vw_veiculos_condominio 
+        WHERE condominio_cnpj = %s
+        ORDER BY Unidade ASC
+    """
+    cursor.execute(sql, (cnpj_condominio,))
+    resultados = cursor.fetchall()
+    cursor.close()
+    return resultados
+
+def buscar_veiculos_filtrados(cnpj_condominio, termo, tipo_filtro):
+    cursor = conexao.cursor()
+    
+    mapa_colunas = {
+        "Placa": "Placa",
+        "Morador": "Proprietario",
+        "Modelo": "Modelo"
+    }
+    
+    coluna_sql = mapa_colunas.get(tipo_filtro, "Placa")
+    
+    sql = f"""
+        SELECT Unidade, Proprietario, CPF, Modelo, Cor, Placa 
+        FROM vw_veiculos_condominio 
+        WHERE condominio_cnpj = %s 
+        AND {coluna_sql} LIKE %s
+        ORDER BY Unidade ASC
+    """
+    
+    termo_busca = f"%{termo}%"
+    
+    cursor.execute(sql, (cnpj_condominio, termo_busca))
+    resultados = cursor.fetchall()
+    cursor.close()
+    return resultados
 
 def listar_veiculos_residencia(id_residencia):
     cursor = conexao.cursor()
@@ -718,6 +745,7 @@ def deletar_veiculo(placa):
         return False
     finally:
         cursor.close()
+
 
 # Taxa
 def listar_taxas_residencia(id_residencia):

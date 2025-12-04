@@ -10,7 +10,6 @@ if 'detail_cnpj' not in st.session_state or st.session_state.detail_cnpj is None
         st.switch_page("pages/detalharCondominio.py")
     st.stop() 
 
-# Pega o CNPJ da memória
 cnpj_atual = st.session_state.detail_cnpj
 
 if st.button("Voltar para Condomínio"):
@@ -33,7 +32,6 @@ if areas_comuns:
         for area in areas_comuns:
             id_a, nome_a, desc_a, cap_a = area
             
-            # --- O CARD DE ÁREA---
             with st.container(border=True):
                 c_content, c_edit, c_del = st.columns([0.8, 0.1, 0.1])
                 

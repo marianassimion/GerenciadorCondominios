@@ -8,9 +8,8 @@ if 'detail_cnpj' not in st.session_state or st.session_state.detail_cnpj is None
     st.warning("Nenhum condomínio selecionado para listagem.")
     if st.button("Voltar para Home"): 
         st.switch_page("pages/detalharCondominio.py")
-    st.stop() # Para a execução
+    st.stop() 
 
-# Pegamos o CNPJ da memória
 cnpj_atual = st.session_state.detail_cnpj
 
 if st.button("Voltar para Condomínio"):
@@ -25,7 +24,6 @@ col_tit, col_btn = st.columns([3, 1], vertical_alignment="bottom")
 col_tit.subheader("Quadro de Funcionários")
 
 if col_btn.button("Novo Empregado", use_container_width=True):
-        # Redireciona para a página de cadastro de empregado
         st.switch_page("pages/cadastroEmpregado.py")
 
 c1, c2, c3, c4, c5,c6, c_edit, c_del = st.columns([2, 1.5, 1.2, 1.5, 1, 1, 0.8, 0.8], vertical_alignment="center")
@@ -41,7 +39,6 @@ st.markdown("<hr style='margin: 5px 0; border: none; border-top: 1px solid #333;
 if empregados:
     with st.container(height=450, border=False):
         for emp in empregados:
-            # Recupera dados (incluindo CPF no índice 5)
             nome_e, cargo_e, mat_e, data_e, sal_e, cpf_e, foto_e = emp
 
             c1, c2, c3, c4, c5, c6, c_edit, c_del = st.columns([2, 1.5, 1.2, 1.5, 1, 1, 0.8, 0.8], vertical_alignment="center")
@@ -65,7 +62,7 @@ if empregados:
             with c_del:
                 if st.button(":material/delete:", key=f"del_emp_{cpf_e}", help="Excluir"):
                     if deletar_empregado(cpf_e):
-                        st.success("Funcionário excluído!") #corrgir tamanho
+                        st.success("Funcionário excluído!") 
                         time.sleep(1)
                         st.rerun()
             st.write("---")

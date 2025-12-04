@@ -6,6 +6,27 @@ st.set_page_config(page_title="Residências", layout="centered")
 
 login_sessao()
 
+@st.dialog("Confirmar Exclusão")
+def confirmar_exclusao(id_residencia):
+    st.warning(f"Tem certeza que deseja excluir essa residência?")
+    st.write("⚠️ Esta ação é irreversível e afetará todos os dados dessa residência.")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if st.button("Sim, excluir", type="primary"):
+            sucesso = deletar_residencia(id_residencia)
+            if sucesso:
+                st.success("Residência deletada com sucesso!")
+                time.sleep(1)
+                st.rerun()
+            else:
+                st.error("Erro ao excluir residência.")
+    with col2:
+        if st.button("Cancelar"):
+            st.rerun()
+
+
 if 'detail_cnpj' not in st.session_state:
     st.warning("Selecione um condomínio primeiro.")
     st.stop()
@@ -50,12 +71,7 @@ with st.container(height=500, border=True):
                 st.switch_page("pages/edicaoResidencia.py")
 
             if c_del.button(":material/delete:", key=f"del_{id_res}", help="Excluir residência"):
-                if deletar_residencia(id_res):
-                    st.success("Residência removida!") 
-                    time.sleep(1)
-                    st.rerun()
-                else:
-                    st.error("Erro ao excluir.")
+                confirmar_exclusao(id_res)
 
 if st.button("Cadastrar Nova Residência", type="primary", use_container_width=True):
     st.switch_page("pages/cadastroResidencia.py")

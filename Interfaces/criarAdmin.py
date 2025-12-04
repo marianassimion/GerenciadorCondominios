@@ -8,7 +8,7 @@ conexao = mysql.connector.connect(
 )
 cursor = conexao.cursor()
 
-email = "rute@condo.com"
+email = "alves@condo.com"
 nome = "Rute"
 senha_texto = "123" 
 
