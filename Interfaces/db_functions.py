@@ -291,8 +291,8 @@ def deletar_empregado(cpf):
 def criar_aviso(titulo, texto, id_administrador, condominio_cnpj):
     cursor = conexao.cursor(buffered=True)
     try:
-        comando = 'INSERT INTO AVISO(titulo, texto, id_administrador) VALUES (%s, %s, %s)'
-        valores = (titulo, texto, id_administrador)
+        comando = 'INSERT INTO AVISO(titulo, texto, id_administrador, condominio_cnpj) VALUES (%s, %s, %s, %s)'
+        valores = (titulo, texto, id_administrador, condominio_cnpj)
         cursor.execute(comando, valores)
         conexao.commit()
         print(f"Aviso '{titulo}' criado com sucesso!")
@@ -305,17 +305,18 @@ def criar_aviso(titulo, texto, id_administrador, condominio_cnpj):
         cursor.close()
 
 # --- [READ] ---
-def listar_avisos():
+def listar_avisos(condominio_cnpj):
     local_conexao = get_db_connection()
     cursor = local_conexao.cursor()
     comando = """
         SELECT aviso.id_aviso, aviso.titulo, aviso.texto, aviso.data_aviso, admin.nome, aviso.condominio_cnpj 
         FROM AVISO AS aviso 
         JOIN ADMINISTRADOR AS admin ON aviso.id_administrador = admin.id_administrador 
+        WHERE aviso.condominio_cnpj = %s
         ORDER BY aviso.data_aviso DESC
     """
     try:
-        cursor.execute(comando)
+        cursor.execute(comando, (condominio_cnpj,))
         return cursor.fetchall()
     except mysql.connector.Error as err:
         st.error(f"Erro ao listar avisos: {err}")

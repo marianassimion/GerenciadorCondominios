@@ -50,7 +50,7 @@ with st.container(height=500, border=True):
             )
 
             # Ícone
-            c_icon.image("./img/car.png", width=60)
+            #c_icon.image("./img/car.png", width=60)
 
             # Informações
             c_info.write(f"**{modelo}**")

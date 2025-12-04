@@ -30,12 +30,13 @@ if cancelar:
     st.switch_page("pages/listagemAvisos.py")
 
 if enviado:
+    print(titulo, texto, id_administrador, cnpj_atual)
     if not titulo:
         st.error('O aviso deve ter um título')
     elif not texto:
         st.error('O aviso não pode estar vazio') 
     else:
-        sucesso = criar_aviso(titulo,texto,id_administrador, cnpj_atual)
+        sucesso = criar_aviso(titulo, texto, id_administrador, cnpj_atual)
         if sucesso:
             st.success("Aviso publicado com sucesso!")
             time.sleep(1.5)

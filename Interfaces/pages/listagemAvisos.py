@@ -27,7 +27,7 @@ if col_btn.button("Novo Aviso", use_container_width=True):
         # Redireciona para a página de cadastro de empregado
         st.switch_page("pages/cadastroAviso.py")
 
-avisos = listar_avisos()
+avisos = listar_avisos(cnpj_atual)
 
 if avisos:
     with st.container(height=500, border=False):
