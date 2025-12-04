@@ -108,6 +108,7 @@ CREATE TABLE TAXA (
 CREATE TABLE MULTA (
     id_multa INTEGER AUTO_INCREMENT PRIMARY KEY,
     data_emissao date NOT NULL,
+    data_vencimento date NOT NULL,
     status_pagamento varchar(10) DEFAULT 'Pendente',
     valor DECIMAL(10, 2),
     descricao VARCHAR(220),
@@ -116,7 +117,6 @@ CREATE TABLE MULTA (
     CONSTRAINT FK_Multa_Residencia 
         FOREIGN KEY(id_residencia) REFERENCES RESIDENCIA(id_residencia)
 );
-
 CREATE TABLE AVISO (
     id_aviso INTEGER AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(50),
