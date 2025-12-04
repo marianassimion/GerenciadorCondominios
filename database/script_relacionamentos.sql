@@ -75,6 +75,7 @@ CREATE TABLE EMPREGADO (
     matricula INT UNSIGNED UNIQUE,
     data_admissao DATE NOT NULL,
     salario DECIMAL(10,2),
+    foto VARCHAR(255),
     condominio_cnpj VARCHAR(14) NOT NULL,
 
     CONSTRAINT FK_empregado_condominio 
