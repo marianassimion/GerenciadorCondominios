@@ -24,7 +24,7 @@ CREATE TABLE ADMINISTRADOR (
 );
 
 CREATE TABLE CONDOMINIO (
-	cnpj 			varchar(16) PRIMARY KEY,
+	cnpj 			varchar(14) PRIMARY KEY,
     id_admin 		INTEGER NOT NULL,
     nome 			varchar(65) NOT NULL,
 	logradouro		varchar(100) NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE RESIDENCIA (
     num_unidade INTEGER unsigned NOT NULL, 
     bloco VARCHAR(10),
     tipo VARCHAR(50),
-    condominio_cnpj VARCHAR(16),
+    condominio_cnpj VARCHAR(14),
     
     CONSTRAINT FK_residencia_condominio 
         FOREIGN KEY (condominio_cnpj) REFERENCES CONDOMINIO(cnpj)
@@ -76,7 +76,8 @@ CREATE TABLE EMPREGADO (
     matricula integer unsigned UNIQUE,
     data_admissao date NOT NULL,
     salario decimal(10,2),
-    condominio_cnpj varchar(16),
+    condominio_cnpj varchar(14),
+    foto LONGBLOB,
 
     CONSTRAINT FK_empregado_condominio 
         FOREIGN KEY (condominio_cnpj) REFERENCES CONDOMINIO(cnpj)
@@ -122,7 +123,7 @@ CREATE TABLE AVISO (
     texto VARCHAR(220),
     data_aviso TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     id_administrador integer,
-    condominio_cnpj varchar(16),
+    condominio_cnpj varchar(14),
 
     CONSTRAINT FK_aviso_administrador
         FOREIGN KEY(id_administrador) REFERENCES ADMINISTRADOR(id_administrador),
@@ -136,7 +137,7 @@ CREATE TABLE AREA_COMUM (
     nome VARCHAR(100) NOT NULL,
     descricao TEXT,
     capacidade INT,
-    condominio_cnpj VARCHAR(16) NOT NULL,
+    condominio_cnpj VARCHAR(14) NOT NULL,
     
     CONSTRAINT FK_area_comum_condominio 
         FOREIGN KEY (condominio_cnpj) REFERENCES CONDOMINIO(cnpj)
