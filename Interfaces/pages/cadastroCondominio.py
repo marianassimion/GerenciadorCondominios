@@ -34,12 +34,14 @@ if cancelar:
 
 # SALVANDO CONDOMÍNIO
 if enviado:
+    print(cnpj,  id_admin,nome, logradouro, bairro, cidade, uf, cep)
+
     if not nome or not cnpj:
         st.warning("Os campos **Nome** e **CNPJ** são obrigatórios.")
     if not cep or not cidade or not uf or not logradouro or not bairro:
         print("Os campos de endereço são obrigatórios!")
     else:
-        cadastrar_condominio = criar_condominio(nome, id_admin, cnpj, logradouro, bairro, cidade, uf, cep)
+        cadastrar_condominio = criar_condominio(cnpj, id_admin, nome, logradouro, bairro, cidade, uf, cep)
         if cadastrar_condominio:
             st.success(f"Condomínio **{nome}** cadastrado com sucesso")
             time.sleep(1) 

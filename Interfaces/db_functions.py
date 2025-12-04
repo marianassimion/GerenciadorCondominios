@@ -63,11 +63,11 @@ def login_sessao():
 # ==============================================================================
 
 # --- [CREATE] ---
-def criar_condominio(cnpj, nome, logradouro, bairro, cidade, uf, cep):
+def criar_condominio(cnpj, id_admin, nome, logradouro, bairro, cidade, uf, cep):
     cursor = conexao.cursor(buffered=True)
     try:
-        cmd = "INSERT INTO condominio (cnpj, nome,  logradouro, bairro, cidade, uf, cep) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-        cursor.execute(cmd, (cnpj, nome,  logradouro, bairro, cidade, uf, cep))
+        cmd = "INSERT INTO condominio (cnpj, id_admin, nome,  logradouro, bairro, cidade, uf, cep) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(cmd, (cnpj, id_admin, nome,  logradouro, bairro, cidade, uf, cep))
         conexao.commit()
         return True
     except mysql.connector.Error:
