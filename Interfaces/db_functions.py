@@ -26,11 +26,11 @@ conexao = get_db_connection()
 # LOGIN
 # ==================================
 def verificar_login(email, senha_digitada):
-    """Verifica as credenciais do administrador no banco de dados"""
+    """Função que verifica as credenciais do administrador no banco de dados"""
     cursor = conexao.cursor(buffered=True)
     try:
-        comando = "SELECT id_administrador, nome, email, senha FROM ADMINISTRADOR WHERE email = %s"
-        cursor.execute(comando, (email,))
+        sql = "SELECT id_administrador, nome, email, senha FROM ADMINISTRADOR WHERE email = %s"
+        cursor.execute(sql, (email,))
         usuario = cursor.fetchone()
         
         if usuario:
@@ -51,7 +51,7 @@ def verificar_login(email, senha_digitada):
         cursor.close()
 
 def login_sessao():
-    """Gerencia o estado da sessão e redirecionamento."""
+    """Função para o gerenciamento do estado da sessão."""
     if not st.session_state.get('logged_in'):
         st.error("Acesso negado. Por favor, faça login.")
         time.sleep(3) 
