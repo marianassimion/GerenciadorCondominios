@@ -60,4 +60,4 @@ with st.container(border=True):
 
 with st.container():
     if st.button("Voltar para Moradores", use_container_width=True):
-        st.switch_page("pages/moradorCondominio.py")
+        st.switch_page("pages/listagemMoradorCondo.py")

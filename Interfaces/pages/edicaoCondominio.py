@@ -4,7 +4,6 @@ from db_functions import obter_condominio_por_cnpj, atualizar_condominio
 
 st.set_page_config(page_title="Editar Condomínio")
 
-# --- FUNÇÃO AUXILIAR DE NAVEGAÇÃO ---
 def voltar_home():
     if 'cnpj_edicao' in st.session_state:
         del st.session_state['cnpj_edicao']

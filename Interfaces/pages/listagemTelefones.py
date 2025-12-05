@@ -62,4 +62,4 @@ if st.button("Cadastrar Novo Telefone", type="primary", use_container_width=True
 
 with st.container():
     if st.button("Voltar para Moradores", use_container_width=True):
-        st.switch_page("pages/moradorResidencia.py")
+        st.switch_page("pages/listagemMoradorResidencia.py")

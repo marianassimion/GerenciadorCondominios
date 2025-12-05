@@ -132,4 +132,4 @@ with tab_multas:
                             st.error("Erro ao excluir.")
 
 if st.button("Voltar para Residências", use_container_width=True):
-    st.switch_page("pages/residencias.py")
+    st.switch_page("pages/listagemResidencias.py")

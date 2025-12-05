@@ -30,7 +30,7 @@ with st.form("form_cadastro_residencia", height=300):
     cancelar = col_b2.form_submit_button("Cancelar", use_container_width=True)
 
 if cancelar:
-    st.switch_page("pages/residencias.py") 
+    st.switch_page("pages/listagemResidencias.py") 
 
 # Salvando nova Residência
 if enviado:
@@ -42,7 +42,7 @@ if enviado:
         if sucesso:
             st.success(f"Residência **{num_unidade} - {bloco}** cadastrada com sucesso!")
             time.sleep(1.5)
-            st.switch_page("pages/residencias.py") 
+            st.switch_page("pages/listagemResidencias.py") 
         else:
             st.error("Não foi possível realizar o cadastro!")
 

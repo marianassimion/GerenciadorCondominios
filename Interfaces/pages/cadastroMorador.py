@@ -34,7 +34,7 @@ with st.form(key='cadastro_morador_form'):
         enviado = st.form_submit_button('Salvar Cadastro', type="primary", use_container_width=True)
 
 if cancelar:   
-    st.switch_page("pages/moradorResidencia.py")
+    st.switch_page("pages/listagemMoradorResidencia.py")
 
 # Salvando novo Morador
 if enviado:
@@ -55,6 +55,6 @@ if enviado:
             if 'details_condominio_mode' in st.session_state:
                 st.session_state.details_condominio_mode = True
                 
-            st.switch_page("pages/moradorResidencia.py")
+            st.switch_page("pages/listagemMoradorResidencia.py")
         else:
             st.error("Erro ao cadastrar morador ou telefone. Verifique os dados.")

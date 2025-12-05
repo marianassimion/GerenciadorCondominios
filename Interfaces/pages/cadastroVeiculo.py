@@ -29,7 +29,7 @@ with st.form(key='cadastro_veiculo_form'):
         enviado = st.form_submit_button('Salvar Cadastro', type="primary", use_container_width=True)
 
 if cancelar:   
-    st.switch_page("pages/veiculos.py")
+    st.switch_page("pages/listagemVeiculoResidencia.py")
 
 # Salvando novo Veículo
 if enviado:
@@ -46,6 +46,6 @@ if enviado:
             if 'details_condominio_mode' in st.session_state:
                 st.session_state.details_condominio_mode = True
                 
-            st.switch_page("pages/veiculos.py")
+            st.switch_page("pages/listagemVeiculoResidencia.py")
         else:
             st.error("Erro ao cadastrar veiculo. Verifique os dados.")

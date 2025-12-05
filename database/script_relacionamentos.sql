@@ -62,7 +62,7 @@ CREATE TABLE MORADOR (
 CREATE TABLE TELEFONE_MORADOR (
     id_telefone_morador INT PRIMARY KEY auto_increment,
     cpf_morador VARCHAR(11),
-    numero VARCHAR(20),
+    numero VARCHAR(11),
     
     CONSTRAINT FK_telefone_morador 
         FOREIGN KEY(cpf_morador) REFERENCES MORADOR(cpf) 
@@ -84,7 +84,7 @@ CREATE TABLE EMPREGADO (
 );
 
 CREATE TABLE VEICULO (
-    placa VARCHAR(10) PRIMARY KEY,
+    placa VARCHAR(7) PRIMARY KEY,
     modelo VARCHAR(40) NOT NULL,
     cor VARCHAR(20),
     morador_cpf VARCHAR(11) NOT NULL,

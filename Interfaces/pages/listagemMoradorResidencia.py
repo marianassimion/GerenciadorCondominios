@@ -47,7 +47,7 @@ with st.container(height=500, border=True):
 
             if c_veic.button(":material/directions_car:", key=f"veic_{cpf}", help="Veículos"):
                 st.session_state['veiculo_morador'] = cpf
-                st.switch_page("pages/veiculos.py")
+                st.switch_page("pages/listagemVeiculoResidencia.py")
 
             if c_edit.button(":material/edit_square:", key=f"edit_{cpf}", help="Editar Morador"):
                 st.session_state['morador_edit'] = cpf
@@ -70,4 +70,4 @@ if st.button("Cadastrar Novo Morador", type="primary", use_container_width=True)
     st.switch_page("pages/cadastroMorador.py")
 
 if st.button("Voltar para Residências", use_container_width=True):
-    st.switch_page("pages/residencias.py")
+    st.switch_page("pages/listagemResidencias.py")

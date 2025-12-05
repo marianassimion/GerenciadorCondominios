@@ -60,11 +60,11 @@ with st.container(height=500, border=True):
                 
             if c_morador.button(":material/perm_identity:", key=f"morador_{id_res}", help="Moradores"):
                 st.session_state['detail_residencia'] = id_res                
-                st.switch_page("pages/moradorResidencia.py")
+                st.switch_page("pages/listagemMoradorResidencia.py")
 
             if c_taxa_multa.button(":material/attach_money:", key=f"taxa_{id_res}", help="Taxas e multas"):
                 st.session_state['detail_residencia'] = id_res                
-                st.switch_page("pages/taxas_multas.py")
+                st.switch_page("pages/listagemTaxasMultas.py")
             
             if c_edit.button(":material/edit_square:", key=f"edit_{id_res}", help="Editar residência"):
                 st.session_state['residencia_edit'] = id_res                

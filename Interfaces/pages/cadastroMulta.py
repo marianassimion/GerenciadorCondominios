@@ -30,7 +30,7 @@ with st.form(key='cadastro_multa_form'):
         enviado = st.form_submit_button('Salvar Cadastro', type="primary", use_container_width=True)
 
 if cancelar:   
-    st.switch_page("pages/taxas_multas.py")
+    st.switch_page("pages/listagemTaxasMultas.py")
 
 # Salvando nova Multa
 if enviado:
@@ -47,6 +47,6 @@ if enviado:
             if 'details_condominio_mode' in st.session_state:
                 st.session_state.details_condominio_mode = True
                 
-            st.switch_page("pages/taxas_multas.py")
+            st.switch_page("pages/listagemTaxasMultas.py")
         else:
             st.error("Erro ao cadastrar multa. Verifique os dados.")

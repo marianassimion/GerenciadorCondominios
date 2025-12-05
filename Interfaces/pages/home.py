@@ -65,15 +65,15 @@ with st.container(height=400, border=True):
             
             if cols[3].button(":material/home_work:", key=f"res_{cnpj_c}", help="Residências"):
                 st.session_state['detail_cnpj'] = cnpj_c                
-                st.switch_page("pages/residencias.py")
+                st.switch_page("pages/listagemResidencias.py")
 
             if cols[4].button(":material/perm_identity:", key=f"mor_{cnpj_c}", help="Moradores"):
                 st.session_state['detail_cnpj'] = cnpj_c                
-                st.switch_page("pages/moradorCondominio.py")
+                st.switch_page("pages/listagemMoradorCondo.py")
 
             if cols[5].button(":material/directions_car:", key=f"car_{cnpj_c}", help="Veículos"):
                 st.session_state['detail_cnpj'] = cnpj_c                
-                st.switch_page("pages/veiculoCondominio.py")
+                st.switch_page("pages/listagemVeiculoCondo.py")
 
             if cols[6].button(":material/edit_square:", key=f"edit_{cnpj_c}", help="Editar"):
                 st.session_state['cnpj_edicao'] = cnpj_c                
