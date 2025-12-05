@@ -43,7 +43,7 @@ if dados_condominio:
     st.caption(f"CNPJ: {cnpj}")
 
 
-st.subheader("Unidades Cadastradas")
+st.subheader("Residências Cadastradas")
 with st.container(height=500, border=True):
     if not residencias:
         st.info("Nenhuma residência cadastrada neste condomínio.")

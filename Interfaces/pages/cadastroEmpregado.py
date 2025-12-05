@@ -2,7 +2,7 @@ import streamlit as st
 import time
 from db_functions import criar_empregado, obter_condominio_por_cnpj, login_sessao
 
-st.set_page_config(page_title="Novo Empregado")
+st.set_page_config(page_title="Novo Empregado", layout="centered")
 
 login_sessao()
 
@@ -20,7 +20,7 @@ st.title("Novo Colaborador")
 st.write(f"Cadastrando funcionário no condomínio: **{nome_condominio}**")
 st.caption(f"CNPJ: {cnpj_atual}")
 
-# FORMULÁRIO
+# Forms
 with st.form(key='cadastro_empregado_form'):
     nome = st.text_input('Nome Completo')
     
@@ -41,7 +41,7 @@ with st.form(key='cadastro_empregado_form'):
 if cancelar:   
     st.switch_page("pages/listagemEmpregados.py")
 
-# SALVANDO EMPREGADO
+# Salvando novo Empregado
 if enviado:
     if not nome or not cpf:
         st.error('Os campos **Nome** e **CPF** são obrigatórios.')

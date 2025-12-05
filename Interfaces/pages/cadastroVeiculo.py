@@ -16,7 +16,7 @@ cpf_morador = st.session_state.veiculo_morador
 st.title("Novo Veículo")
 st.markdown(f"Preencha os dados")
 
-# FORMULÁRIO
+# Forms
 with st.form(key='cadastro_veiculo_form'):
     placa  = st.text_input('Placa*', max_chars=10)
     modelo = st.text_input('Modelo*', max_chars=40)
@@ -31,7 +31,7 @@ with st.form(key='cadastro_veiculo_form'):
 if cancelar:   
     st.switch_page("pages/veiculos.py")
 
-# SALVANDO VEICULO
+# Salvando novo Veículo
 if enviado:
     if not placa or not modelo or not cor:
         st.warning("Por favor, preencha a data de emissão, a data de vencimento e a cor")

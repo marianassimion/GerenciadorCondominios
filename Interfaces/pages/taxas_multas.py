@@ -1,12 +1,6 @@
 import streamlit as st
 import time
-from db_functions import (
-    obter_residencia_por_id,
-    listar_taxas_residencia,
-    listar_multas_residencia,
-    deletar_taxa,
-    deletar_multa,
-    login_sessao)
+from db_functions import obter_residencia_por_id, listar_taxas_residencia, listar_multas_residencia, deletar_taxa, deletar_multa, login_sessao
 
 st.set_page_config(page_title="Taxas e Multas", layout="centered")
 

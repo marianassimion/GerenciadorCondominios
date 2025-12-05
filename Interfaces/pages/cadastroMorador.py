@@ -15,7 +15,7 @@ id_residencia = st.session_state.detail_residencia
 st.title("Novo Morador")
 st.markdown(f"Preencha os dados do novo morador")
 
-# FORMULÁRIO
+# Forms
 with st.form(key='cadastro_morador_form'):
     nome = st.text_input('Nome*')
     
@@ -36,7 +36,7 @@ with st.form(key='cadastro_morador_form'):
 if cancelar:   
     st.switch_page("pages/moradorResidencia.py")
 
-# SALVANDO MORADOR 
+# Salvando novo Morador
 if enviado:
     if not nome or not cpf:
         st.warning("Por favor, preencha o Nome e o CPF.")

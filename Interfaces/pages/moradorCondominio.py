@@ -6,7 +6,6 @@ st.set_page_config(page_title="Moradores", layout="centered")
 
 login_sessao()
 
-# Verifica se há um condomínio selecionado na sessão
 if 'detail_cnpj' not in st.session_state:
     st.warning("Selecione um condomínio primeiro.")
     st.stop()
@@ -26,7 +25,6 @@ st.subheader("Moradores do Condomínio")
 moradores = listar_moradores_condominio(cnpj)
 
 with st.container(height=500, border=True):
-
     if not moradores:
         st.info("Nenhum morador cadastrado nesse condomínio.")
     

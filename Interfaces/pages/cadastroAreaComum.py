@@ -2,9 +2,10 @@ import streamlit as st
 from db_functions import criar_area_comum, obter_condominio_por_cnpj, login_sessao
 import time
 
+st.set_page_config(page_title="Nova Área Comum", layout="centered")
+
 login_sessao()
 
-# Pegar o id do administrador
 id_administrador = st.session_state.usuario[0]
 
 if 'detail_cnpj' not in st.session_state or st.session_state.detail_cnpj is None:
@@ -19,6 +20,7 @@ nome_condominio = dados_condo[0] if dados_condo else "Não identificado"
 st.title("Nova área comum")
 st.write(f"Cadastrando nova área comum para o condomínio: **{nome_condominio}**")
 
+# Forms
 with st.form(key='cadastro_area_comum_form'):
     nome = st.text_input('Nome')
     descricao = st.text_area('Descrição', height=60)
@@ -30,6 +32,7 @@ with st.form(key='cadastro_area_comum_form'):
 if cancelar:
     st.switch_page("pages/listagemAvisos.py")
 
+# Salvando nova Área Comum
 if enviado:
     if not nome:
         st.error('A área comum deve ter um título')

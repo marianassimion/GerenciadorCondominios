@@ -2,7 +2,7 @@ import streamlit as st
 import time
 from db_functions import obter_veiculos_por_condominio, buscar_veiculos_filtrados
 
-st.set_page_config(page_title="Listagem de Veículos")
+st.set_page_config(page_title="Veículos", layout="centered")
 
 if 'detail_cnpj' not in st.session_state or st.session_state.detail_cnpj is None:
     st.warning("Nenhum condomínio selecionado.")

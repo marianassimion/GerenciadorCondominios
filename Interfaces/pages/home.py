@@ -2,6 +2,8 @@ import streamlit as st
 from db_functions import *
 import time
 
+st.set_page_config(page_title="Condomínios", layout="centered")
+
 @st.dialog("Confirmar Exclusão")
 def confirmar_exclusao(cnpj):
     st.warning(f"Tem certeza que deseja excluir esse condomínio?")
@@ -22,7 +24,6 @@ def confirmar_exclusao(cnpj):
         if st.button("Cancelar"):
             st.rerun()
 
-conexao = get_db_connection()
 
 if "usuario" not in st.session_state:
     st.switch_page("login.py") 

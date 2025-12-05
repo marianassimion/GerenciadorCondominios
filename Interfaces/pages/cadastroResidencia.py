@@ -15,7 +15,7 @@ cnpj = st.session_state.detail_cnpj
 st.title("Nova Residência")
 st.markdown(f"Preencha os dados da unidade para o condomínio atual.")
 
-# FORMULÁRIO
+# Forms
 with st.form("form_cadastro_residencia", height=300):
     st.subheader("Dados da Unidade")
     
@@ -32,7 +32,7 @@ with st.form("form_cadastro_residencia", height=300):
 if cancelar:
     st.switch_page("pages/residencias.py") 
 
-# SALVANDO RESIDÊNCIA
+# Salvando nova Residência
 if enviado:
     if not num_unidade:
         st.warning("O campo **Número da Unidade** é obrigatório.")

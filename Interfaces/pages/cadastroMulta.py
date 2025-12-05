@@ -2,7 +2,7 @@ import streamlit as st
 import time
 from db_functions import login_sessao, criar_multa
 
-st.set_page_config(page_title="Nova Taxa", layout="centered")
+st.set_page_config(page_title="Nova Multa", layout="centered")
 
 login_sessao()
 
@@ -15,7 +15,7 @@ id_residencia = st.session_state.detail_residencia
 st.title("Nova Multa")
 st.markdown(f"Preencha os dados")
 
-# FORMULÁRIO
+# Forms
 with st.form(key='cadastro_multa_form'):
     data_emissao = st.date_input('Data de Emissão*')
     data_vencimento = st.date_input('Data de Vencimento*')
@@ -32,7 +32,7 @@ with st.form(key='cadastro_multa_form'):
 if cancelar:   
     st.switch_page("pages/taxas_multas.py")
 
-# SALVANDO MULTA
+# Salvando nova Multa
 if enviado:
     if not data_emissao or not data_vencimento:
         st.warning("Por favor, preencha a data de emissão e a data de vencimento.")

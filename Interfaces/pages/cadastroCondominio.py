@@ -2,7 +2,7 @@ import streamlit as st
 from db_functions import criar_condominio, login_sessao
 import time
 
-st.set_page_config(page_title="Novo Condomínio")
+st.set_page_config(page_title="Novo Condomínio", layout="centered")
 
 id_admin = st.session_state.usuario[0]
 login_sessao()
@@ -10,7 +10,7 @@ login_sessao()
 st.title("Novo Condomínio")
 st.markdown("Preencha os dados abaixo para registrar um novo condomínio.")
 
-# FORMULÁRIO
+# Forms
 with st.form("form_cadastro_condominio", height=600):
     st.subheader("Dados do Condomínio")
     nome = st.text_input("Nome do Condomínio*", placeholder="Ex: Residencial Flores")
@@ -32,7 +32,7 @@ with st.form("form_cadastro_condominio", height=600):
 if cancelar:
     st.switch_page("pages/home.py")
 
-# SALVANDO CONDOMÍNIO
+# Salvando novo Condomínio
 if enviado:
     print(cnpj,  id_admin,nome, logradouro, bairro, cidade, uf, cep)
 

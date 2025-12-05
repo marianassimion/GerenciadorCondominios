@@ -18,7 +18,7 @@ nome = morador[1]
 st.title("Novo telefone")
 st.subheader(f"Morador: **{nome}**")
 
-# FORMULÁRIO
+# Forms
 with st.form(key='cadastro_telefone_form'):
     telefone = st.text_input('Telefone*', placeholder="Ex: 61999999999", max_chars=11)
     
@@ -32,7 +32,7 @@ with st.form(key='cadastro_telefone_form'):
 if cancelar:   
     st.switch_page("pages/listagemTelefones.py")
 
-# SALVANDO TELEFONE
+# Salvando novo Telefone
 if enviado:
     if not telefone:
         st.warning("Por favor, preencha o número de telefone.")

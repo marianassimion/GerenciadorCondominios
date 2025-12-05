@@ -2,9 +2,10 @@ import streamlit as st
 from db_functions import criar_aviso, obter_condominio_por_cnpj, login_sessao
 import time
 
+st.set_page_config(page_title="Novo Aviso", layout="centered")
+
 login_sessao()
 
-# Pegar o id do administrador
 id_administrador = st.session_state.usuario[0]
 
 if 'detail_cnpj' not in st.session_state or st.session_state.detail_cnpj is None:
@@ -19,6 +20,7 @@ nome_condominio = dados_condo[0] if dados_condo else "Não identificado"
 st.title("Novo aviso")
 st.write(f"Cadastrando aviso para o condomínio: **{nome_condominio}**")
 
+# Forms
 with st.form(key='cadastro_aviso_form'):
     titulo = st.text_input('Título')
     texto = st.text_area('Texto', height=150)
@@ -29,6 +31,7 @@ with st.form(key='cadastro_aviso_form'):
 if cancelar:
     st.switch_page("pages/listagemAvisos.py")
 
+# Salvando novo Aviso
 if enviado:
     print(titulo, texto, id_administrador, cnpj_atual)
     if not titulo:

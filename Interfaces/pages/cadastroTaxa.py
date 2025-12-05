@@ -15,7 +15,7 @@ id_residencia = st.session_state.detail_residencia
 st.title("Nova Taxa")
 st.markdown(f"Preencha os dados")
 
-# FORMULÁRIO
+# Forms
 with st.form(key='cadastro_taxa_form'):
     data_emissao = st.date_input('Data de Emissão*')
     data_vencimento = st.date_input('Data de Vencimento*')
@@ -31,7 +31,7 @@ with st.form(key='cadastro_taxa_form'):
 if cancelar:   
     st.switch_page("pages/taxas_multas.py")
 
-# SALVANDO TAXA
+# Salvando nova Taxa
 if enviado:
     if not data_emissao or not data_vencimento:
         st.warning("Por favor, preencha a data de emissão e a data de vencimento.")

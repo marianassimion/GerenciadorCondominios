@@ -2,7 +2,7 @@ import streamlit as st
 import time
 from db_functions import login_sessao, obter_condominio_por_cnpj, obter_empregados, deletar_empregado
 
-st.set_page_config(page_title="Detalhes do Condomínio")
+st.set_page_config(page_title="Detalhes do Condomínio", layout="centered")
 
 login_sessao()
 
@@ -23,13 +23,11 @@ dados_condominio = obter_condominio_por_cnpj(cnpj_atual)
 if dados_condominio:
     nome, log, bai, cid, uf, cep = dados_condominio
     
-    # Cabeçalho do Condomínio
     st.title(f"🏢 {nome}")
     st.caption(f"{log}, {bai} - {cid}/{uf} | CEP: {cep}")
     st.caption(f"CNPJ: {cnpj_atual}")
     st.divider()
 
-    # Avisos, Empregados, Áreas Comuns
     c_avisos, c_empregados, c_areas = st.columns([1.5, 1.5,1.5], vertical_alignment="bottom")
 
     if c_avisos.button("Quadro de avisos", use_container_width=True):
