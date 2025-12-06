@@ -21,7 +21,7 @@ Este sistema está sendo desenvolvido no contexto da disciplina de **Banco de Da
 
 ## 📁 Estrutura do Projeto
 
-```bash
+```
 GerenciadorCondominios/
 ├── main.py
 ├── config.py
@@ -59,12 +59,11 @@ GerenciadorCondominios/
     ├── script_procedure.sql
     ├── script_trigger.sql
     └── view.sql
-
+```
 ---
 
-# ✅ 2. DESCRIÇÃO DE CADA PASTA DO PROJETO 
+# 🗒️ DESCRIÇÃO DE CADA PASTA DO PROJETO 
 
-```markdown
 ## 📁 Organização das Pastas do Projeto
 
 A estrutura do projeto está organizada da seguinte forma:
