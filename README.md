@@ -62,67 +62,6 @@ GerenciadorCondominios/
 ```
 ---
 
-# 🗒️ DESCRIÇÃO DE CADA PASTA DO PROJETO 
-
-## 📁 Organização das Pastas do Projeto
-
-A estrutura do projeto está organizada da seguinte forma:
-
-### 🔹 `main.py`
-Arquivo principal do projeto. É o ponto de entrada do sistema e responsável por iniciar a aplicação Streamlit.
-
----
-
-### 🔹 `config.py`
-Arquivo de configuração da conexão com o banco de dados MySQL. Contém as credenciais do banco utilizadas pelo sistema.
-
----
-
-### 🔹 `requirements.txt`
-Arquivo que lista todas as dependências do projeto, permitindo que qualquer pessoa instale rapidamente tudo que é necessário para executar o sistema.
-
----
-
-### 🔹 `docs/`
-Contém toda a documentação do projeto:
-- `relatorio.pdf`: relatório do projeto
-
----
-
-### 🔹 `media/`
-Armazena os diagramas do banco de dados:
-- `MER.jpg`: Modelo Entidade-Relacionamento
-- `MR.jpg`: Modelo Relacional
-- `Camada_de_Persistencia.png`: Acesso da interface ao banco de dados
----
-
-### 🔹 `pages/`
-Contém todas as telas do sistema desenvolvidas com Streamlit. Cada arquivo representa uma funcionalidade da aplicação, como:
-- Tela de condomínios
-- Login
-- Gerenciamento de moradores
-- Veículos
-- Taxas
-- Entre outras funcionalidades
-
----
-
-### 🔹 `src/`
-Pasta que contém a camada de persistência
-- `db_functions.py`: Camada de persistência responsável por todas as operações no banco de dados (INSERT, SELECT, UPDATE, DELETE).
-- `interface/img/`: Contém as imagens utilizadas na interface do sistema.
-
----
-
-### 🔹 `database/`
-Pasta que contém todos os scripts SQL utilizados no projeto:
-- `script_relacionamentos.sql`: 
-- `script_inserts.sql`: inserção de dados iniciais (5 por tabela)
-- `script_procedure`: criação da procedure
-- `script_trigger.sql`: criação do trigger
-- `script_view.sql`: criação da view
----
-
 ## 🚀 Como Rodar o Projeto
 
 Siga este passo a passo para configurar o ambiente e executar o sistema na sua máquina.
@@ -161,8 +100,7 @@ db_config = {
     'host': 'localhost',          # Geralmente é 'localhost'
     'user': 'root',               # Seu usuário do MySQL (ex: root)
     'password': 'SUA_SENHA_AQUI', # <--- COLOQUE A SENHA DO SEU BANCO AQUI
-    'database': 'condominio_db'   # O nome do banco que você criou no passo anterior
-}
+    'database': 'condominio'   # O nome do banco que você criou no passo anterior}
 ```
 
 ## 4️⃣ Instalação das Dependências
@@ -170,10 +108,10 @@ Abra o terminal na pasta raiz do projeto (GerenciadorCondominios/) e execute:
 ```python
     python -m venv venv
 
-    #Windows:
+    # Windows:
     venv\Scripts\activate
 
-    #Linux/Mac:
+    # Linux/Mac:
     source venv/bin/activate
 
     # Instale as bibliotecas necessárias
