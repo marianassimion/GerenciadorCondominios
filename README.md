@@ -59,3 +59,70 @@ GerenciadorCondominios/
     ├── script_procedure.sql
     ├── script_trigger.sql
     └── view.sql
+
+---
+
+# ✅ 2. DESCRIÇÃO DE CADA PASTA DO PROJETO 
+
+```markdown
+## 📁 Organização das Pastas do Projeto
+
+A estrutura do projeto está organizada da seguinte forma:
+
+### 🔹 `main.py`
+Arquivo principal do projeto. É o ponto de entrada do sistema e responsável por iniciar a aplicação Streamlit.
+
+---
+
+### 🔹 `config.py`
+Arquivo de configuração da conexão com o banco de dados MySQL. Contém as credenciais do banco utilizadas pelo sistema.
+
+---
+
+### 🔹 `requirements.txt`
+Arquivo que lista todas as dependências do projeto, permitindo que qualquer pessoa instale rapidamente tudo que é necessário para executar o sistema.
+
+---
+
+### 🔹 `docs/`
+Contém toda a documentação do projeto:
+- `relatorio.pdf`: relatório do projeto
+
+---
+
+### 🔹 `media/`
+Armazena os diagramas do banco de dados:
+- `MER.jpg`: Modelo Entidade-Relacionamento
+- `MR.jpg`: Modelo Relacional
+- `Camada_de_Persistencia.png`: Acesso da interface ao banco de dados
+---
+
+### 🔹 `pages/`
+Contém todas as telas do sistema desenvolvidas com Streamlit. Cada arquivo representa uma funcionalidade da aplicação, como:
+- Tela de condomínios
+- Login
+- Gerenciamento de moradores
+- Veículos
+- Taxas
+- Entre outras funcionalidades
+
+---
+
+### 🔹 `src/`
+Pasta que contém a camada de persistência
+- `db_functions.py`: Camada de persistência responsável por todas as operações no banco de dados (INSERT, SELECT, UPDATE, DELETE).
+- `interface/img/`: Contém as imagens utilizadas na interface do sistema.
+
+---
+
+### 🔹 `database/`
+Pasta que contém todos os scripts SQL utilizados no projeto:
+- `script_relacionamentos.sql`: 
+- `script_inserts.sql`: inserção de dados iniciais (5 por tabela)
+- `script_procedure`: criação do gatilho
+- `script_trigger.sql`: criação do gatilho
+- `script_view.sql`: criação da view
+---
+
+
+
