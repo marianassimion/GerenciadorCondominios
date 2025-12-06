@@ -1,0 +1,7 @@
+#CONFIGURAÇÕES PARA CONEXÃO COM O BANCO DE DADOS
+
+DB_HOST = 'localhost'
+DB_USER = 'root'
+DB_PASSWORD = '8192'
+DB_NAME = 'condominio'
+
