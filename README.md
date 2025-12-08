@@ -69,7 +69,7 @@ Siga este passo a passo para configurar o ambiente e executar o sistema na sua m
 ### 1️⃣ Pré-requisitos
 Antes de começar, certifique-se de ter instalado:
 * [Python 3.12+](https://www.python.org/downloads/)
-* [MySQL Server](https://dev.mysql.com/downloads/mysql/) 
+* [MySQL](https://dev.mysql.com/downloads/installer/) 
 ---
 
 ### 2️⃣ Configuração do Banco de Dados
