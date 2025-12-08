@@ -39,7 +39,7 @@ GerenciadorCondominios/
 │
 ├── pages/
 │   ├── home.py
-│   ├── listagemMoradores.py
+│   ├── listagemMoradorCondo.py
 │   ├── edicaoMorador.py
 │   ├── listagemMoradorResidencia.py
 │   ├── listagemResidencias.py
