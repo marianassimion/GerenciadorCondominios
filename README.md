@@ -30,7 +30,7 @@ GerenciadorCondominios/
 ├── .gitignore
 │
 ├── documents/
-│   ├── relatorio.pdf
+│   └── Relatorio.pdf
 │  
 ├── Media/
 │   ├── Camada_de_Persistencia.png
