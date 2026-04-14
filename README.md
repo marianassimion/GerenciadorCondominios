@@ -29,11 +29,11 @@ GerenciadorCondominios/
 ├── README.md
 ├── .gitignore
 │
-├── docs/
+├── documents/
 │   ├── relatorio.pdf
 │   └── manual_usuario.pdf
 │
-├── media/
+├── Media/
 │   ├── MER.jpg
 │   └── MR.jpg
 │
