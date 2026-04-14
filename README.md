@@ -31,8 +31,7 @@ GerenciadorCondominios/
 │
 ├── documents/
 │   ├── relatorio.pdf
-│   └── manual_usuario.pdf
-│
+│  
 ├── Media/
 │   ├── MER.jpg
 │   └── MR.jpg
