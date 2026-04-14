@@ -53,7 +53,7 @@ GerenciadorCondominios/
 │           ├── morador.png
 │           └── ...
 │
-└── database/
+└── sql/
     ├── script_relacionamentos.sql
     ├── script_inserts.sql
     ├── script_procedure.sql
@@ -75,7 +75,7 @@ Antes de começar, certifique-se de ter instalado:
 ### 2️⃣ Configuração do Banco de Dados
 
 1. Abra o MySQL e crie um novo banco de dados vazio com o nome `condominio`.
-2. Execute os scripts SQL localizados na pasta `database/` **exatamente nesta ordem**:
+2. Execute os scripts SQL localizados na pasta `sql/` **exatamente nesta ordem**:
    1. `script_relacionamentos.sql` 
    2. `script_inserts.sql` 
    3. `script_view.sql` 
@@ -96,11 +96,11 @@ Exemplo de como o arquivo deve ficar:
 ```python
 # config.py
 
-db_config = {
+db_config =
     'host': 'localhost',          # Geralmente é 'localhost'
     'user': 'root',               # Seu usuário do MySQL (ex: root)
     'password': 'SUA_SENHA_AQUI', # <--- COLOQUE A SENHA DO SEU BANCO AQUI
-    'database': 'condominio'   # O nome do banco que você criou no passo anterior}
+    'database': 'condominio'   # O nome do banco que você criou no passo anterior
 ```
 
 ## 4️⃣ Instalação das Dependências
@@ -116,7 +116,6 @@ Abra o terminal na pasta raiz do projeto (GerenciadorCondominios/) e execute:
 
     # Instale as bibliotecas necessárias
     pip install -r requirements.txt
-}
 ```
 ## 5️⃣ Executando o Sistema
 Com tudo configurado, execute o comando abaixo para iniciar a interface:
