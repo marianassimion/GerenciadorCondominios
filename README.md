@@ -33,7 +33,8 @@ GerenciadorCondominios/
 │   ├── relatorio.pdf
 │  
 ├── Media/
-│   ├── MER.jpg
+│   ├── Camada_de_Persistencia.png
+    └── MER.jpg
 │   └── MR.jpg
 │
 ├── pages/
