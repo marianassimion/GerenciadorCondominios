@@ -15,7 +15,6 @@ Este sistema está sendo desenvolvido no contexto da disciplina de **Banco de Da
 - Streamlit
 - MySQL
 - MySQL Connector Python
-- Git & GitHub
 
 ---
 
